@@ -4,7 +4,7 @@
 
 - Repositorio público nuevo, rama main; acceso ADMIN desde terminal GitHub.
 - Clonado en computadora virtual; no se depende de una carpeta personal.
-- Documentación inicial preparada; la subida se verifica desde el remoto tras el commit.
+- Documentación inicial subida y contenido remoto verificado mediante API GitHub. git push devuelve HTTP 401; la API permite escritura. Usar API y verificar remoto; no afirmar que git push funciona.
 - Control-prestamos y Control-tarjetas revisados en clones de lectura, sin modificaciones.
 - Ambos contienen drive-backup.js y usan el Worker compartido indicado en la especificación.
 - Cliente actual agrupa cambios durante 2,5 segundos, reintenta con espera creciente hasta 120 segundos, reacciona al regreso de internet/visibilidad y muestra fecha confirmada por el servicio.
@@ -14,14 +14,15 @@
 
 ## Pendiente / no afirmado
 
-- Firebase: proyecto, Authentication, usuario permitido y reglas aún sin configurar.
+- Firebase: proyecto y app web creados; Spark, Google habilitado, dominio Pages autorizado y Firestore default creado, según capturas del usuario.
+- Reglas visibles bloquean todas las lecturas/escrituras (if false). Cuenta autorizada y pruebas de acceso pendientes. Región definitiva no verificada.
 - Worker: obtener implementación desplegada y configuración NO secreta; comprobar identificadores permitidos, aislamiento, CORS, formato, conservación, límites y autorización.
 - OAuth: estado Prueba/Producción y conexión Drive no comprobados.
-- Sin pruebas reales de guardar/listar/descargar/restaurar. Sin publicación de esta app.
+- Sin pruebas reales de guardar/listar/descargar/restaurar. Página de configuración de acceso preparada para Pages; no es la interfaz financiera final.
 
 ## Próximo paso
 
-Crear proyecto Firebase nuevo en Spark desde el teléfono siguiendo FIREBASE.md. Mantener cerrado Firestore hasta configurar cuenta y reglas. Luego revisar Worker vigente y probar ciclo con datos ficticios antes de pantallas completas.
+Publicar página mínima de inicio de sesión en Pages, comprobar archivos y obtener UID de la cuenta desde el navegador del usuario. Mantener bloqueado Firestore; instalar autorización privada fuera del repositorio y probar reglas antes de datos reales. Luego revisar Worker y probar ciclo ficticio.
 
 ## Retomar otra sesión
 
