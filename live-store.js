@@ -1,5 +1,5 @@
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
-import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import * as sdk from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
 import {createLedgerRepository} from './ledger-repository.js';
 const app=initializeApp({apiKey:'AIzaSyBB4GrQQeRwgQlJ_jFqMbJzRU4FOTaI1cw',authDomain:'control-de-gastos-72453.firebaseapp.com',projectId:'control-de-gastos-72453',appId:'1:585615744945:web:e720a412a6bbd7c6382790'});
@@ -9,7 +9,7 @@ export async function connectStore({onState,onStatus,onSignedOut}){
  const login=document.getElementById('app-login'),logout=document.getElementById('app-logout'),retry=document.getElementById('app-retry');
  function failure(error){onStatus(errorMessage(error),false,error.code==='permission-denied');}
  async function subscribe(user){const ownGeneration=++generation;unsubscribe?.();unsubscribe=null;repository=null;onSignedOut();login.hidden=!!user;logout.hidden=!user;retry.hidden=!user;if(!user){onStatus('Entrá con Google para abrir tus movimientos.',false);return;}onStatus('Comprobando tus datos en Firebase…',false);const candidate=createLedgerRepository(db,user.uid,sdk);try{const state=await candidate.read();if(ownGeneration!==generation)return;repository=candidate;onState(state);onStatus(state.revision?'Datos confirmados en Firebase.':'Cuenta conectada. Todavía no registraste movimientos.',true);unsubscribe=candidate.watch(state=>{if(ownGeneration===generation){onState(state);onStatus(state.revision?'Datos confirmados en Firebase.':'Cuenta conectada. Todavía no registraste movimientos.',true);}},error=>{if(ownGeneration===generation){repository=null;onSignedOut();failure(error);}});}catch(error){if(ownGeneration===generation)failure(error);}}
- await setPersistence(auth,browserSessionPersistence);login.disabled=false;
+ await setPersistence(auth,browserLocalPersistence);login.disabled=false;
  onAuthStateChanged(auth,subscribe,failure);
  login.addEventListener('click',async()=>{login.disabled=true;try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider);}catch(error){failure(error);}finally{login.disabled=false;}});
  logout.addEventListener('click',()=>signOut(auth).catch(failure));retry.addEventListener('click',()=>subscribe(auth.currentUser));

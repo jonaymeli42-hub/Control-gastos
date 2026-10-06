@@ -184,3 +184,7 @@ El usuario aprobó el diseño y autorizó conectar movimientos, categorías, edi
 
 ## Cuenta discreta e instalación
 El usuario pide ocultar el panel permanente de Cerrar sesión/Revisar conexión: dejar indicador pequeño y controles en botón de cuenta del encabezado. El panel se muestra para iniciar sesión o atender errores. Se prepara instalación mediante manifest e iconos con inicio en app.html. La misma cuenta autorizada accede a los datos de Firebase desde distintos dispositivos; Drive se conecta por dispositivo. No modificar reglas de acceso para incorporar otras cuentas ni almacenar registros financieros en caché por instalarla.
+
+
+## Mantener la sesión al cerrar la app
+El usuario pide no volver a conectar Google en cada apertura. Firebase Auth usa persistencia local en este dispositivo, también en la configuración. Cerrar sesión sigue eliminando la sesión guardada. Los movimientos siguen privados en Firestore y sin almacenamiento financiero persistente local.

@@ -11,7 +11,7 @@ El icono se llama Gastos y abre la aplicación con guardado, no la demostración
 
 En iPhone: abrir app.html en Safari → Compartir → Agregar a inicio.
 
-El manifest configura nombre, iconos, alcance y apertura standalone. No hay service worker ni caché de datos financieros. Instalarla no habilita guardado sin Internet ni copias con la app cerrada. Se mantiene la sesión de navegador configurada, sin pasar a una sesión permanente de autenticación.
+El manifest configura nombre, iconos, alcance y apertura standalone. No hay service worker ni caché de datos financieros. Instalarla no habilita guardado sin Internet ni copias con la app cerrada. La sesión se conserva en el dispositivo hasta usar Cerrar sesión. Los registros financieros siguen en Firebase, sin caché financiera local.
 
 Los controles de cuenta se abren tocando el icono de persona junto al selector de tema: Cerrar sesión, Revisar conexión y detalles del estado. Cuando está conectada, la pantalla principal muestra únicamente un pequeño indicador. Al salir de la sesión vuelve a aparecer el acceso con Google.
 

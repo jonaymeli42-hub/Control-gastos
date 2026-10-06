@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 // Public web connection configuration; access is controlled by server-side rules.
 const app = initializeApp({
   apiKey: 'AIzaSyBB4GrQQeRwgQlJ_jFqMbJzRU4FOTaI1cw',
@@ -34,7 +34,7 @@ onAuthStateChanged(auth, user => {
   uid.value = user?.uid || '';
   status.textContent = user ? 'Inicio de sesión confirmado. Todavía no se accedió a Firestore.' : 'Listo para entrar con Google.';
 }, failure);
-try { await setPersistence(auth, browserSessionPersistence); login.disabled = false; }
+try { await setPersistence(auth, browserLocalPersistence); login.disabled = false; }
 catch (error) { failure(error); }
 login.addEventListener('click', async () => {
   login.disabled = true;
