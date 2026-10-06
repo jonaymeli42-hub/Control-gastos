@@ -116,3 +116,12 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Mostrar diseño con datos ficticios identificados y permitir correcciones antes de completar interfaz.
 - Automatizar fechas, nunca fijos ni pases.
 - Verificar aislamiento de cuenta, sincronización de dispositivos, errores de permisos/cuotas/red, respaldo completo, restauración validada, idempotencia y concurrencia.
+
+## Corrección acordada: Historial y Movimientos
+
+- Agregar una sección Historial para elegir cualquier mes anterior y recorrer sus pantallas con ese mes activo (ejemplo: septiembre desde octubre).
+- En consulta histórica, Inicio/Efectivo/Virtual/Movimientos conservan el mes seleccionado; regresar a Efectivo no lleva a hoy hasta salir explícitamente del Historial. En uso normal se mantiene el comportamiento original de volver a hoy.
+- Mostrar claramente el mes histórico y una acción Volver al mes actual. No hay arrastre de saldos.
+- Agregar pestaña Movimientos con todas las operaciones de Efectivo y Virtual, propias/ajenas, transferencias, pases y Ahorro / Préstamos. Consultar por mes y fecha. Transferencias/pases vinculados aparecen una sola vez en la vista conjunta; sus efectos siguen visibles en los saldos correspondientes.
+- Evolución continúa mostrando solo dinero propio, independiente de la vista conjunta.
+- Navegación de Historial/Movimientos pendiente de preferencia del usuario; demostración inicial incluye ambas vistas como pestañas, con etiquetas legibles.

@@ -83,3 +83,12 @@ Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Ai
 - Formulario de pase usa Mes de origen explícito (mes consultado) y Mes de destino (actual si origen anterior); la fecha habitual de ingresos/gastos no cambia.
 - Lista distingue salida «Para …» y entrada «Desde …», guardadas en una sola operación vinculada.
 - Prueba Chromium: septiembre Efectivo $4.000 → $0; octubre Efectivo $7.150 → $11.150; Evolución conserva ingresos $15.000/$12.000 sin contar el pase.
+
+## Cambios pedidos: Historial y Movimientos
+
+- Implementados en demo: sección Historial con selector de mes, meses existentes, contexto histórico persistente entre pestañas y regreso explícito al mes actual.
+- Movimientos reúne operaciones propias/ajenas de Efectivo y Virtual, pases y Ahorro/Préstamos agrupadas por fecha. Transferencias/pases figuran una vez por operación vinculada.
+- Demostración inicialmente con ambas pestañas nuevas; usuario puede preferir reunir acceso a Historial dentro de Movimientos.
+- Prueba Chromium a 390 px: septiembre conservado en Inicio/Efectivo/Virtual/Movimientos; listado septiembre 2 registros; salida explícita vuelve a octubre; transferencia conjunta una sola fila; sin desbordamiento.
+- Corrección anterior de pase entre meses conservada. No afecta Firebase ni otras apps.
+- El despliegue anterior de Pages permanece esperando en GitHub; no afirmar estas vistas publicadas hasta comprobar archivos remotos.
