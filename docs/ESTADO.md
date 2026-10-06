@@ -41,3 +41,9 @@ Clonar jonaymeli42-hub/Control-gastos, leer esta documentación y comprobar perm
 - Adaptación propuesta en worker/worker.js; 7/7 pruebas mock correctas. No desplegada.
 - Prueba Firebase real confirmada por captura: escritura, lectura desde servidor y eliminación del diagnóstico ficticio completas.
 - Pendientes: denegación real con segunda cuenta, prueba desde segundo dispositivo, OAuth Prueba/Producción, callback y cliente Gastos, despliegue del Worker, ciclo completo con restauración ficticia.
+
+## OAuth y conexión de Gastos
+
+- Capturas del usuario confirman proyecto «Respaldo de mis apps» y OAuth En producción. No se infiere verificación de Google ni validez perpetua de tokens.
+- Página drive-respaldos.html y retorno drive-callback.html preparados reutilizando el cliente existente, con validación específica de Gastos y mensajes sin afirmar guardado local.
+- Creación/restauración desde Firestore aún no habilitadas. Pendiente actualizar Worker desde Cloudflare y probar conexión real.
