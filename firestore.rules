@@ -14,6 +14,20 @@ service cloud.firestore {
         && request.resource.data.kind == 'fictitious-access-check'
         && request.resource.data.updatedAt == request.time;
     }
+    // Isolated sandbox: only two fixed fictitious amounts, no financial records.
+    match /users/{uid}/diagnostics/backup-check {
+      allow get: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['kind', 'amountCents', 'revision', 'updatedAt'])
+        && request.resource.data.kind == 'fictitious-backup-check'
+        && request.resource.data.amountCents in [12345, 54321]
+        && request.resource.data.revision is int
+        && request.resource.data.updatedAt == request.time
+        && ((!exists(/databases/$(database)/documents/users/$(uid)/diagnostics/backup-check)
+              && request.resource.data.revision == 1)
+            || (exists(/databases/$(database)/documents/users/$(uid)/diagnostics/backup-check)
+              && request.resource.data.revision == resource.data.revision + 1));
+    }
     // Configuration is administrator-only; all other app data remains blocked.
     match /{document=**} {
       allow read, write: if false;

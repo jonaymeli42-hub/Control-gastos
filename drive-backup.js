@@ -37,7 +37,7 @@
     if (!navigator.onLine) { message = 'Pendiente: esperando conexión a Internet.'; paint(); return; }
     busy = true; message = ''; paint();
     try {
-      const backup = getBackup();
+      const backup = await getBackup();
       const fingerprint = await hash(JSON.stringify(backup.data));
       if (fingerprint === state.hash) {
         const current = read(); if (current.revision === state.revision) write({ ...current, pending: false });
@@ -75,7 +75,7 @@
       if (!host.querySelector('[data-drive-status]')) {
         host.innerHTML = '<h3>Respaldo privado en Google Drive</h3><p data-drive-status role="status" aria-live="polite"></p><p data-drive-last></p><div class="drive-actions"><button type="button" data-drive-action="connect">Conectar con Google</button><button type="button" data-drive-action="save">Crear copia ahora</button><button type="button" data-drive-action="disconnect">Desconectar este dispositivo</button><a href="drive-respaldos.html">Ver y descargar copias</a></div><p class="drive-note">Requiere la app abierta e Internet. Conservá también copias manuales. No se restauran datos automáticamente.</p>';
       }
-      host.querySelector('[data-drive-status]').textContent = state.reconnect ? 'Necesitás reconectar con Google.' : !state.token ? 'Drive desconectado. El estado de Firebase se comprueba por separado.' : busy ? 'Enviando copia…' : state.pending ? 'Pendiente de respaldo.' : state.last ? 'Última copia confirmada.' : 'Conexión con Drive confirmada; todavía no se creó una copia.';
+      host.querySelector('[data-drive-status]').textContent = state.reconnect ? 'Necesitás reconectar con Google.' : !state.token ? 'Drive desconectado. El estado de Firebase se comprueba por separado.' : busy ? 'Enviando copia…' : !getBackup ? 'Conexión con Drive confirmada; sin creación de copias habilitada aquí.' : state.pending ? 'Pendiente de respaldo.' : state.last ? 'Última copia confirmada.' : 'Conexión con Drive confirmada; todavía no se creó una copia.';
       host.querySelector('[data-drive-last]').textContent = (state.last ? 'Última copia confirmada: ' + new Date(state.last).toLocaleString('es-AR') + '. ' : '') + message;
       host.querySelector('[data-drive-action="connect"]').hidden = !!state.token && !state.reconnect;
       host.querySelector('[data-drive-action="connect"]').textContent = state.reconnect ? 'Reconectar con Google' : 'Conectar con Google';
@@ -104,7 +104,14 @@
           message = 'Descarga solicitada. La restauración validada todavía está en preparación.'; paint();
         } catch (error) { failure(error); } finally { button.disabled = false; }
       };
-      row.append(label, button); host.append(row);
+      const restore = document.createElement('button'); restore.type = 'button'; restore.textContent = 'Restaurar prueba';
+      restore.onclick = async () => {
+        restore.disabled = true;
+        try { const backup = await api('/backups/download?id=' + encodeURIComponent(file.id)); window.dispatchEvent(new CustomEvent('gastos:restore-test', { detail: backup })); }
+        catch (error) { failure(error); } finally { restore.disabled = false; }
+      };
+      if (getBackup) row.append(label, button, restore); else row.append(label, button);
+      host.append(row);
     }
     if (!result.files.length) host.textContent = 'No hay copias para esta app en la cuenta conectada.';
     message = 'Listado actualizado. Se muestran hasta las 100 copias más recientes.'; paint();
@@ -146,8 +153,8 @@
     window.addEventListener('storage', event => { if (event.key === key) { paint(); if (read().pending) schedule(); } });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) schedule(0); });
     if (options.callback) callback();
-    else if (getBackup && read().token) changed();
+    // The Firebase adapter marks changes only after authentication and a server read.
   }
-  window.DriveBackup = { init, changed };
+  window.DriveBackup = { init, changed, request: api };
   if (document.body.dataset.driveApp) init({ app: document.body.dataset.driveApp, callback: document.body.dataset.driveCallback === 'true' });
 })();

@@ -45,3 +45,17 @@ test('missing or empty configuration fails closed', async () => {
   await assertFails(setDoc(doc(env.authenticatedContext(owner).firestore(),path),payload()));
  }
 });
+test('sandbox accepts only fixed fictitious values and monotonic revisions', async () => {
+ const db=env.authenticatedContext(owner).firestore();const ref=doc(db,`users/${owner}/diagnostics/backup-check`);
+ const value=(amountCents,revision)=>({kind:'fictitious-backup-check',amountCents,revision,updatedAt:serverTimestamp()});
+ await assertFails(setDoc(ref,value(12345,2)));
+ await assertSucceeds(setDoc(ref,value(12345,1)));
+ await assertSucceeds(getDoc(ref));
+ await assertFails(setDoc(ref,value(12345,1)));
+ await assertFails(setDoc(ref,value(99999,2)));
+ await assertFails(setDoc(ref,{...value(54321,2),description:'forbidden'}));
+ await assertSucceeds(setDoc(ref,value(54321,2)));
+ await assertFails(deleteDoc(ref));
+ await assertFails(getDoc(doc(env.authenticatedContext(other).firestore(),`users/${owner}/diagnostics/backup-check`)));
+ await assertFails(setDoc(doc(env.authenticatedContext(other).firestore(),`users/${other}/diagnostics/backup-check`),value(12345,1)));
+});

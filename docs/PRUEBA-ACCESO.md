@@ -21,3 +21,13 @@ Entrar con Google y pulsar Probar guardado y lectura. La página espera confirma
 Verificar también desde otro dispositivo con la cuenta autorizada; comprobar denegación con otra cuenta. No ingresar importes, nombres ni datos financieros reales en esta fase. El éxito en el emulador no demuestra que las reglas desplegadas sean las mismas: confirmar mediante estas pruebas y consola.
 
 Drive no está conectado en esta prueba; no se afirma ningún respaldo.
+
+## Prueba de copias y recuperación
+
+Las reglas actuales del repositorio agregan users/{uid}/diagnostics/backup-check, con solo importes ficticios 12345/54321 centavos y revisión incremental. No se permite eliminar ese diagnóstico desde cliente ni agregar campos financieros reales. Publicar reglas antes de usar botones de prueba.
+
+La página drive-respaldos.html conserva el token Drive en el navegador conforme al cliente existente; nunca lo publica. Necesita también sesión Firebase autorizada. Usa el registro completo del sandbox leído del servidor, no localStorage como fuente de datos. SHA-256 detecta corrupción accidental; no es una firma de autenticidad. Cada copia indica mode diagnostic-only, que deberá rechazarse en restauración de datos financieros reales.
+
+Guardar $123,45; esperar confirmación Drive. Cambiar a $543,21; esperar segunda copia. Consultar listado y descargar primera copia. Elegir Restaurar prueba de esa copia y confirmar. El adapter guarda primero una copia del estado actual y después restaura bajo condición de revisión, aumentando la revisión; no rebobina el historial. Comprobar importe recuperado y nueva copia automática. Si cambia otro dispositivo, la transacción rechaza la restauración; no sobrescribe silenciosamente.
+
+Una copia más antigua puede seleccionarse explícitamente en esta prueba; no se restaura sola. La prueba aún no habilita ni verifica la contabilidad completa, todas sus colecciones, ni la sincronización entre dispositivos.

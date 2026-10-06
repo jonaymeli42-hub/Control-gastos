@@ -47,3 +47,11 @@ Clonar jonaymeli42-hub/Control-gastos, leer esta documentación y comprobar perm
 - Capturas del usuario confirman proyecto «Respaldo de mis apps» y OAuth En producción. No se infiere verificación de Google ni validez perpetua de tokens.
 - Página drive-respaldos.html y retorno drive-callback.html preparados reutilizando el cliente existente, con validación específica de Gastos y mensajes sin afirmar guardado local.
 - Creación/restauración desde Firestore aún no habilitadas. Pendiente actualizar Worker desde Cloudflare y probar conexión real.
+
+## Ciclo ficticio de recuperación preparado
+
+- Worker versión 7389c7c Active según captura; /health configured true y /auth/start acepta gastos comprobados desde remoto.
+- Conexión real Drive y listado de Gastos vacío confirmados por capturas.
+- Preparados backup-test.js y backup-test-format.js: sandbox separado, transacciones con revisiones, snapshot leído desde servidor, checksum, descarga, restauración confirmada y copia previa obligatoria.
+- Reglas ampliadas solo para diagnóstico fijo; 7/7 pruebas de reglas y 3/3 pruebas de formato pasaron.
+- Pendiente que usuario publique reglas nuevas y complete ciclo real: guardar → respaldo automático → listado → descarga → restauración. No afirmar ciclo real completo aún.
