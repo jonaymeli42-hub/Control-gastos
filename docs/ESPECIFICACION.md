@@ -154,3 +154,12 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Al salir y regresar a Efectivo o Virtual, volver al mes y día actuales y desplazar la lista hasta hoy. Esta indicación posterior reemplaza conservar el mes histórico entre entradas a esas dos pestañas. Consultar otros meses sigue disponible mediante flechas dentro de cada pestaña.
 - Evolución muestra meses consecutivos uno debajo de otro, incluidos los meses sin movimientos, sin crear registros ni trasladar saldos. Demostración: enero a diciembre del año actual; ampliar años si hay registros de otros años.
 - Al salir y regresar a Evolución, volver al mes actual, ubicar su fila y cerrar detalles.
+
+
+### Categorías y edición de todos los registros — 6 de octubre de 2026
+
+La demostración agrega una pestaña Categorías independiente: crear, renombrar y quitar categorías, seleccionar categoría al registrar cada gasto y consultar totales por mes de Efectivo y Virtual. Quitar una categoría conserva sus gastos como Sin categoría, sin alterar importes ni saldos. Solo los gastos cuentan en estos totales.
+
+Todos los registros de la demostración pueden editarse y eliminarse tocándolos en Efectivo, Virtual o Movimientos: ingresos propios y aportes, gastos, Ahorro / Préstamos, transferencias y pases entre meses. Se permite cambiar importe, descripción, fecha, ubicación, tipo y categoría cuando corresponde. Eliminar requiere confirmación; transferencias y pases se editan o eliminan como una sola operación con dos partes. Los saldos y totales se recalculan.
+
+Validado en navegador móvil: categoría nueva, gasto categorizado, edición de importe y total, eliminación de categoría conservando gasto, eliminación de gasto y actualización de ambas partes de una transferencia. La demostración sigue usando datos ficticios en memoria; recargar descarta cambios. Estas pantallas aún no guardan datos financieros en Firebase.

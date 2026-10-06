@@ -123,3 +123,12 @@ Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Ai
 - Implementados días vacíos sin crear operaciones. Meses enero-diciembre del año actual y extensión si hay registros de otros años.
 - Cambiar de pestaña y regresar a Efectivo/Virtual/Evolución vuelve al actual, incluso si se había consultado otro mes. Flechas siguen disponibles para consultar meses dentro de la pestaña.
 - Prueba Chromium 390 px: 31 días octubre, 30 septiembre en ambas ubicaciones; hoy visible al entrar; regresar restablece octubre; Evolución 12 meses, detalles cerrados y octubre visible; sin desbordamiento.
+
+
+### Categorías y edición de todos los registros — 6 de octubre de 2026
+
+La demostración agrega una pestaña Categorías independiente: crear, renombrar y quitar categorías, seleccionar categoría al registrar cada gasto y consultar totales por mes de Efectivo y Virtual. Quitar una categoría conserva sus gastos como Sin categoría, sin alterar importes ni saldos. Solo los gastos cuentan en estos totales.
+
+Todos los registros de la demostración pueden editarse y eliminarse tocándolos en Efectivo, Virtual o Movimientos: ingresos propios y aportes, gastos, Ahorro / Préstamos, transferencias y pases entre meses. Se permite cambiar importe, descripción, fecha, ubicación, tipo y categoría cuando corresponde. Eliminar requiere confirmación; transferencias y pases se editan o eliminan como una sola operación con dos partes. Los saldos y totales se recalculan.
+
+Validado en navegador móvil: categoría nueva, gasto categorizado, edición de importe y total, eliminación de categoría conservando gasto, eliminación de gasto y actualización de ambas partes de una transferencia. La demostración sigue usando datos ficticios en memoria; recargar descarta cambios. Estas pantallas aún no guardan datos financieros en Firebase.
