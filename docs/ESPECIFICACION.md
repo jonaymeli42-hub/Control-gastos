@@ -45,7 +45,7 @@ Fecha: 2026-10-06. Fuente de verdad para desarrollo y correcciones acordadas en 
 
 ## Modelo financiero
 
-Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia a Virtual. Importes en pesos con centavos; cálculos exactos sin errores de coma flotante. Ambos tipos Mío/Ajeno afectan saldo real.
+Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia a Virtual. Importes en pesos con centavos; cálculos exactos sin errores de coma flotante. Los ingresos propios y los aportes de otras personas afectan el saldo real; los pagos se registran completos.
 
 ### Inicio
 
@@ -53,13 +53,13 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Tarjetas Efectivo y Virtual con Dinero actual; tocar abre la ubicación.
 - Solo tres botones principales: + Sueldo diario, Movimiento Efectivo, Movimiento Virtual.
 - Distinguir saldo del mes de dinero repartido en otros meses; no inventar arrastres.
-- Propuesta a revisar: acceso a Resumen de ajenos dentro de Virtual y accesible desde Efectivo, sin agregar un cuarto botón principal a Inicio.
+- No hay Resumen de ajenos: el modelo vigente usa aportes recibidos, sin casos ni reclasificaciones.
 
 ### Sueldo diario y movimientos
 
 - Sueldo: solo importe y guardar; ingreso propio en Efectivo hoy. No pedir ubicación ni fecha en carga habitual. Editar importe/fecha después.
 - Movimiento determina ubicación por botón. Tipos: gasto; otro ingreso (incluidos fijos); transferencia a otra ubicación; pase a otro mes; enviar a Ahorro / Préstamos; traer desde Ahorro / Préstamos.
-- Importe, descripción y fecha actual editable. Mío por defecto; selector Mío/Ajeno para ingresos y gastos comunes. No exigir campos innecesarios.
+- Importe, descripción y fecha actual editable. Ingresos: Propio por defecto o Aporte de otra persona. Gastos: importe completo, sin clasificar por persona. No exigir campos innecesarios.
 
 ### Efectivo y Virtual
 
@@ -84,14 +84,17 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Registro MANUAL cuando se cobra/paga; jamás generación automática por fecha.
 - Opciones iniciales acordadas: «Sueldo de Melanie» y «Sueldo de Misael», sin importes reales. Crear en los datos privados, no como datos personales en el código público.
 
-### Dinero ajeno y diferencias
+### Aportes de otras personas — modelo definitivo acordado
 
-- Vincular cobros/pagos por persona o concepto en casos, admitiendo varios registros y meses.
-- Caso abierto conserva identificación de dinero ajeno pendiente. Diferencia temporal recibido − pagado no equivale a ganancia ni a obligación real pendiente.
-- Resumen por caso/general: recibido, pagado, casos y dinero por resolver/pagar, diferencias confirmadas propias, abierto/cerrado. Modelar obligación real separadamente de la resta.
-- Al confirmar cierre, diferencia positiva acordada se reconoce como «Ingreso propio por diferencia de ajenos», sin sumar de nuevo al saldo. Ejemplo ficticio: recibido $100.000, pagado $90.000, diferencia propia confirmada $10.000.
-- Registrar fecha de reconocimiento y trazabilidad al cobro original. Diferencia propia aparece en Evolución.
-- Editar, borrar o reabrir mantiene saldo/clasificación coherentes. No asignar todo el pendiente a una cuenta si hubo transferencias; identificarlo globalmente sin duplicación.
+- Reemplaza íntegramente los casos de dinero ajeno, cierres y reclasificaciones propuestos antes.
+- Solo al registrar ingresos elegir Propio o Aporte de otra persona. Sueldo diario es siempre propio.
+- Todos los gastos se registran completos, sin selector Mío/Ajeno, sin parcializar pagos ni vincular gastos a aportes.
+- Ejemplo ficticio: ingreso de aporte $300.000 y pago de resumen $1.000.000; la diferencia del período es $700.000. No dividir el pago en registros individuales.
+- Ambos tipos de ingreso suman al saldo; pago completo descuenta. Transferencias y pases no son nuevos ingresos ni gastos.
+- En Evolución separar ingresos propios, aportes recibidos y gastos pagados; mostrar al desplegar el mes gastos menos aportes, y Ahorro / Préstamos por separado.
+- Cada movimiento pertenece a su mes de fecha. No emparejar automáticamente aportes de otro mes ni trasladar saldos.
+- Gastos menos aportes es la resta del período, no una obligación pendiente ni una ganancia confirmada. Si aportes superan gastos, mostrar diferencia negativa explícita, sin reclasificarla como ingreso propio.
+- No Resumen de ajenos, casos, cierre, obligaciones por persona ni Pasar de ajeno a propio.
 
 ### Ahorro / Préstamos
 
@@ -102,15 +105,17 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 
 ### Evolución
 
-- Lista MUY compacta, un mes por fila: mes, ingresos propios, gastos propios, neto destinado Ahorro / Préstamos; combinar Efectivo + Virtual.
-- Tocar despliega detalle propio y Ahorro / Préstamos. Excluir ajenos incluso en detalle; incluir diferencias confirmadas propias.
-- Excluir transferencias y pases mensuales.
-- Cada regreso sitúa mes actual con detalles cerrados; conservar consulta de anteriores.
+- Lista MUY compacta por mes, combinando Efectivo + Virtual.
+- Fila: mes, ingresos propios, aportes de otras personas, gastos completos y neto destinado a Ahorro / Préstamos.
+- Tocar despliega importes exactos, detalle de ingresos/aportes/pagos y cálculo gastos − aportes recibidos del mes.
+- Excluir transferencias y pases de totales de ingresos/gastos; nunca contarlos dos veces.
+- Comparación por mes de fecha, sin arrastre ni asignación automática de aportes a pagos de otros meses.
+- Al volver en uso habitual, mes actual y detalles cerrados. Durante consulta de otro mes conservar ese contexto hasta Volver al mes actual.
 
 ## Edición, aspecto y aceptación
 
-- Todos los registros editables/eliminables; confirmar eliminación, recalcular saldos/resúmenes, conservar vínculos y coherencia de casos.
-- Pestañas Inicio, Efectivo, Virtual, Evolución, Respaldo.
+- Todos los registros editables/eliminables; confirmar eliminación, recalcular saldos/resúmenes, conservar vínculos entre las partes de transferencias y pases.
+- Pestañas Inicio, Efectivo, Virtual, Evolución, Respaldo y Movimientos.
 - Botón pequeño de tema arriba en TODAS las pestañas, solo Claro/Oscuro; persistir elección coherentemente.
 - Celular compacto, legible y adaptable a computadora; navegación clara y carga sencilla.
 - Mostrar diseño con datos ficticios identificados y permitir correcciones antes de completar interfaz.
@@ -122,8 +127,8 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Agregar una sección Historial para elegir cualquier mes anterior y recorrer sus pantallas con ese mes activo (ejemplo: septiembre desde octubre).
 - En consulta histórica, Inicio/Efectivo/Virtual/Movimientos conservan el mes seleccionado; regresar a Efectivo no lleva a hoy hasta salir explícitamente del Historial. En uso normal se mantiene el comportamiento original de volver a hoy.
 - Mostrar claramente el mes histórico y una acción Volver al mes actual. No hay arrastre de saldos.
-- Agregar pestaña Movimientos con todas las operaciones de Efectivo y Virtual, propias/ajenas, transferencias, pases y Ahorro / Préstamos. Consultar por mes y fecha. Transferencias/pases vinculados aparecen una sola vez en la vista conjunta; sus efectos siguen visibles en los saldos correspondientes.
-- Evolución continúa mostrando solo dinero propio, independiente de la vista conjunta.
+- Agregar pestaña Movimientos con todas las operaciones de Efectivo y Virtual, ingresos propios/aportes, pagos completos, transferencias, pases y Ahorro / Préstamos. Consultar por mes y fecha. Transferencias/pases vinculados aparecen una sola vez en la vista conjunta; sus efectos siguen visibles en los saldos correspondientes.
+- Evolución distingue ingresos propios, aportes recibidos y gastos completos, independiente de la vista conjunta.
 - Preferencia confirmada: Historial y Movimientos son dos pestañas diferentes.
 
 ## Selector mensual visual
@@ -137,3 +142,8 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Con las flechas mensuales, el usuario indica eliminar la pestaña Historial. Esta corrección reemplaza la decisión anterior de mantener dos pestañas nuevas.
 - Pestañas finales acordadas: Inicio, Efectivo, Virtual, Evolución, Respaldo y Movimientos.
 - Se mantiene consulta de meses anteriores mediante flechas y selección directa, contexto de mes elegido entre pantallas y Volver al mes actual. No se elimina ningún mes ni movimiento.
+
+## Apariencia
+
+- El usuario pide una apariencia más llamativa, manteniendo compacidad y legibilidad móvil.
+- Demostración con cabecera azul profundo, saldo verde intenso, Efectivo en acento ámbar, Virtual violeta, iconos y modos Claro/Oscuro. Conservar solo tres acciones principales en Inicio.

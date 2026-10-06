@@ -107,3 +107,12 @@ Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Ai
 - Pestañas: Inicio, Efectivo, Virtual, Evolución, Respaldo, Movimientos. Flechas y regreso al actual conservan consulta histórica.
 - Chromium a 390 px: seis pestañas; septiembre persiste al entrar en Movimientos; regresar a octubre mantiene Movimientos; sin desbordamiento.
 - Selector con flechas anterior (56c38b2) verificado publicado HTTP 200 y comparación de archivos. Nueva simplificación en proceso de publicación.
+
+## Modelo simplificado aprobado y apariencia
+
+- Usuario aprueba distinguir solo ingresos Propio/Aporte de otra persona; gastos completos sin repartir, casos ni reclasificaciones. Especificación consolidada actualizada y demostración adaptada.
+- Evolución separa propios, aportes, gastos completos y neto Ahorro/Préstamos; desplegar muestra gastos menos aportes del mismo mes.
+- Retirados selector Mío/Ajeno en gastos, casos, Resumen de ajenos y cierres del demo.
+- Apariencia más llamativa: cabecera azul, saldo verde, acentos Efectivo ámbar / Virtual violeta e iconos; Claro/Oscuro conservados.
+- Prueba Chromium: gastos sin selector; aporte ficticio extra $200.000 aumenta aportes a $500.000 y resta mensual queda $501.850; seis pestañas y sin desbordamiento a 390 px/1100 px; temas revisados visualmente.
+- Datos ficticios del demo solo en memoria; Firestore financiero final y respaldo del modelo completo aún pendientes. No confundir con sandbox de respaldo ya probado.

@@ -7,3 +7,22 @@ nav{grid-template-columns:repeat(4,1fr);padding-top:6px}nav button{min-height:36
 
 /* Historical consultation uses the month arrows; six tabs remain. */
 nav{grid-template-columns:repeat(6,minmax(0,1fr))}nav button{font-size:10px;min-height:44px;padding:8px 2px}.app{padding-bottom:105px}#toast{bottom:85px}@media(min-width:650px){nav{grid-template-columns:repeat(6,minmax(0,1fr))}nav button{font-size:12px}}
+
+/* More vivid visual direction, with separate colors for cash and virtual. */
+:root{--bg:#f3f6fb;--accent:#137c57;--soft:#e9f7ee;--contribution:#7155bd;--shadow:0 10px 26px #2238540b}
+html[data-theme=dark]{--bg:#101a2b;--panel:#1a2940;--text:#f1f5fa;--muted:#b1bfd2;--line:#334661;--accent:#7edbb2;--soft:#1c3d36;--contribution:#c2a8ff}
+body{background:radial-gradient(ellipse at top right,#728ceb10,transparent 70%),var(--bg)}
+.app>header{margin:-24px -18px 18px;padding:25px 18px 22px;background:linear-gradient(125deg,#172d4d,#26375b 65%,#39355c);color:#fff;border-radius:0 0 24px 24px;box-shadow:0 12px 24px #1830520e}
+header .eyebrow{color:#b2ddd0;letter-spacing:1.7px}header h1{font-weight:750}header #theme{background:#ffffff12;color:#fff;border-color:#ffffff30}
+.demo-note{background:var(--panel);border:1px solid var(--line);padding:9px 12px;border-radius:10px;margin-bottom:22px}.dot{background:#e1a53e}
+.hero{position:relative;overflow:hidden;background:linear-gradient(120deg,#128958,#09674d 65%,#15524c);border:0;box-shadow:0 12px 26px #09694b20;padding:26px;border-radius:22px;color:#fff}
+.hero::after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;right:-90px;top:-65px;border:26px solid #ffffff09;pointer-events:none}
+.hero p{color:#d4eee1;font-weight:600}.hero .balance{color:#fff;font-size:38px;font-weight:750;letter-spacing:-1px;margin:8px 0}.hero small{color:#cdeade}
+.account-card{border-radius:18px;padding:17px 13px;background:var(--panel);box-shadow:var(--shadow);border-top:4px solid #dfaa3b}.account-card[data-go=virtual]{border-top-color:#8970d6}.account-card strong{font-size:clamp(18px,5.5vw,25px);font-weight:750;letter-spacing:-.8px}.account-card small{font-weight:550}.account-card span:first-child{font-weight:650;color:var(--text)}
+.actions{gap:10px}.actions .primary{background:linear-gradient(100deg,#128958,#0b7052);color:#fff;border:0;font-weight:650;box-shadow:0 7px 15px #09865515}.actions .action[data-move=cash]{border-left:4px solid #dfaa3b}.actions .action[data-move=virtual]{border-left:4px solid #8970d6}.actions button{border-radius:13px}
+.days{box-shadow:var(--shadow);border-radius:17px}.today .date-col{box-shadow:inset 3px 0 var(--accent)}.entry{padding-top:12px;padding-bottom:12px}.entry strong{font-weight:550}.money{font-variant-numeric:tabular-nums}
+.page-title{font-weight:750}.month-arrow{box-shadow:var(--shadow)}.month-title strong{font-weight:700}.history-banner{border-color:var(--accent)}
+.evolution-labels,.evolution-row{grid-template-columns:38px repeat(4,minmax(0,1fr));gap:5px}.evolution-labels{font-size:9px}.evolution-row{font-size:10px;font-variant-numeric:tabular-nums}.evolution-row small{display:block;font-size:9px}.evolution{box-shadow:var(--shadow)}.evolution details.selected-month{box-shadow:inset 3px 0 var(--accent)}.contribution{color:var(--contribution)}.detail-body small{display:block;font-size:10px;color:var(--muted);margin-top:3px}.calculation{background:var(--soft);padding:10px 12px;border-radius:10px;margin:8px 0 13px}.calculation .detail-line:last-of-type{border:0;padding-bottom:0}.calculation p{margin-bottom:0}
+nav{box-shadow:0 -6px 20px #12284709}.nav-icon{width:19px;height:19px;display:block;margin:0 auto 4px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}nav button{padding:7px 2px;min-height:54px;font-weight:500}nav button[aria-current=page]{color:var(--accent);box-shadow:inset 0 -2px var(--accent)}
+.pill{font-weight:650}dialog{box-shadow:0 25px 90px #06142655;border-radius:22px}dialog .primary{color:#fff;background:#128958}form fieldset label{margin-top:5px}.app{padding-bottom:115px}#toast{bottom:94px}
+@media(min-width:650px){.app>header{margin:-34px -30px 22px;padding:30px;border-radius:0 0 26px 26px}.evolution-row{font-size:12px}.evolution-labels{font-size:11px}.account-card strong{font-size:27px}}
