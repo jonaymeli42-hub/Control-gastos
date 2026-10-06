@@ -147,3 +147,10 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 
 - El usuario pide una apariencia más llamativa, manteniendo compacidad y legibilidad móvil.
 - Demostración con cabecera azul profundo, saldo verde intenso, Efectivo en acento ámbar, Virtual violeta, iconos y modos Claro/Oscuro. Conservar solo tres acciones principales en Inicio.
+
+## Calendario completo y posición al regresar
+
+- Efectivo y Virtual muestran todos los días del mes consultado, incluidos los que no tienen movimientos; orden cronológico y día actual identificado.
+- Al salir y regresar a Efectivo o Virtual, volver al mes y día actuales y desplazar la lista hasta hoy. Esta indicación posterior reemplaza conservar el mes histórico entre entradas a esas dos pestañas. Consultar otros meses sigue disponible mediante flechas dentro de cada pestaña.
+- Evolución muestra meses consecutivos uno debajo de otro, incluidos los meses sin movimientos, sin crear registros ni trasladar saldos. Demostración: enero a diciembre del año actual; ampliar años si hay registros de otros años.
+- Al salir y regresar a Evolución, volver al mes actual, ubicar su fila y cerrar detalles.

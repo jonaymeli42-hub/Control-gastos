@@ -26,3 +26,6 @@ header .eyebrow{color:#b2ddd0;letter-spacing:1.7px}header h1{font-weight:750}hea
 nav{box-shadow:0 -6px 20px #12284709}.nav-icon{width:19px;height:19px;display:block;margin:0 auto 4px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}nav button{padding:7px 2px;min-height:54px;font-weight:500}nav button[aria-current=page]{color:var(--accent);box-shadow:inset 0 -2px var(--accent)}
 .pill{font-weight:650}dialog{box-shadow:0 25px 90px #06142655;border-radius:22px}dialog .primary{color:#fff;background:#128958}form fieldset label{margin-top:5px}.app{padding-bottom:115px}#toast{bottom:94px}
 @media(min-width:650px){.app>header{margin:-34px -30px 22px;padding:30px;border-radius:0 0 26px 26px}.evolution-row{font-size:12px}.evolution-labels{font-size:11px}.account-card strong{font-size:27px}}
+
+/* Keep empty calendar days compact and distinguish the current month. */
+.day .empty{padding:14px 12px;min-height:52px;display:flex;align-items:center}.day .date-col{padding-top:10px;padding-bottom:10px}.evolution details.selected-month{background:var(--soft)}

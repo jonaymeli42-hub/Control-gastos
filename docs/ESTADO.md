@@ -116,3 +116,10 @@ Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Ai
 - Apariencia más llamativa: cabecera azul, saldo verde, acentos Efectivo ámbar / Virtual violeta e iconos; Claro/Oscuro conservados.
 - Prueba Chromium: gastos sin selector; aporte ficticio extra $200.000 aumenta aportes a $500.000 y resta mensual queda $501.850; seis pestañas y sin desbordamiento a 390 px/1100 px; temas revisados visualmente.
 - Datos ficticios del demo solo en memoria; Firestore financiero final y respaldo del modelo completo aún pendientes. No confundir con sandbox de respaldo ya probado.
+
+## Calendario completo y regreso a la fecha actual
+
+- Pedido del usuario: todos los días en Efectivo/Virtual, todos los meses consecutivos en Evolución; al regresar, ubicar día/mes actuales.
+- Implementados días vacíos sin crear operaciones. Meses enero-diciembre del año actual y extensión si hay registros de otros años.
+- Cambiar de pestaña y regresar a Efectivo/Virtual/Evolución vuelve al actual, incluso si se había consultado otro mes. Flechas siguen disponibles para consultar meses dentro de la pestaña.
+- Prueba Chromium 390 px: 31 días octubre, 30 septiembre en ambas ubicaciones; hoy visible al entrar; regresar restablece octubre; Evolución 12 meses, detalles cerrados y octubre visible; sin desbordamiento.
