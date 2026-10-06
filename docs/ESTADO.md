@@ -68,3 +68,11 @@ Capturas del usuario el 2026-10-06 confirman:
 Este resultado comprueba solo el sandbox ficticio y esta cuenta/dispositivo. Aún pendientes: datos financieros completos, rechazo real con segunda cuenta, segundo dispositivo, reintentos sin red, compatibilidad real posterior del Worker con las otras apps y restauración del modelo final.
 
 Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Aires y formato 24 horas.
+
+## Demostración visual
+
+- demo.html, demo.css, demo.js: cinco pestañas, tres botones Inicio, dos ubicaciones, listado diario, Resumen de ajenos en Efectivo/Virtual, Evolución propia compacta, Claro/Oscuro.
+- Importes ficticios, estado en memoria y sin Firebase. Permite simular carga diaria, ingresos/gastos, transferencias, pases y Ahorro/Préstamos; no representa aplicación final completa.
+- Pendientes en interfaz/modelo final: edición/eliminación, fijos privados, casos y cierres/reclasificaciones completos, recuperación del modelo financiero, reglas completas y sincronización multi-dispositivo.
+- Revisión Chromium local: cinco pestañas sin desbordamiento a 390 px; carga ficticia con centavos; hoy visible en Efectivo; Evolución vuelve con detalles cerrados; tema oscuro; presentación a 1100 px sin desbordamiento.
+- Esperar comentarios de diseño del usuario mientras se conserva la especificación vigente.

@@ -8,3 +8,7 @@ Aplicación personal nueva en preparación. Página inicial de acceso publicada 
 - [Configuración de Firebase desde el teléfono](docs/FIREBASE.md)
 
 Desarrollo en el entorno remoto de Codex. GitHub conserva código e instrucciones entre sesiones. Publicación prevista exclusivamente en GitHub Pages. Los datos privados estarán en Firestore y las copias en Google Drive, nunca en este repositorio público.
+
+## Diseño para revisión
+
+Demostración separada: demo.html (GitHub Pages). Datos e importes ficticios y cambios solo en memoria. No usa Firebase ni envía datos a Drive. Recargar descarta operaciones de ejemplo; solo se conserva la elección de tema.
