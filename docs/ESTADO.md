@@ -55,3 +55,16 @@ Clonar jonaymeli42-hub/Control-gastos, leer esta documentación y comprobar perm
 - Preparados backup-test.js y backup-test-format.js: sandbox separado, transacciones con revisiones, snapshot leído desde servidor, checksum, descarga, restauración confirmada y copia previa obligatoria.
 - Reglas ampliadas solo para diagnóstico fijo; 7/7 pruebas de reglas y 3/3 pruebas de formato pasaron.
 - Pendiente que usuario publique reglas nuevas y complete ciclo real: guardar → respaldo automático → listado → descarga → restauración. No afirmar ciclo real completo aún.
+
+## Resultado del ciclo real ficticio
+
+Capturas del usuario el 2026-10-06 confirman:
+
+- Guardado $123,45 ficticios en Firestore, revisión 1, y copia automática confirmada en Drive.
+- Listado con dos archivos distintos de Gastos tras cambio a $543,21; copia inicial conservada.
+- Restauración de copia inicial confirmada por aplicación: $123,45 en Firestore, revisión 3; copia previa creada y nueva copia automática confirmada. La restauración incluye lectura/validación de JSON desde Drive.
+- Descarga manual al teléfono fue solicitada, pero no se recibió evidencia independiente de archivo guardado por Chrome. No afirmar ese paso más allá de la descarga utilizada por restauración.
+
+Este resultado comprueba solo el sandbox ficticio y esta cuenta/dispositivo. Aún pendientes: datos financieros completos, rechazo real con segunda cuenta, segundo dispositivo, reintentos sin red, compatibilidad real posterior del Worker con las otras apps y restauración del modelo final.
+
+Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Aires y formato 24 horas.
