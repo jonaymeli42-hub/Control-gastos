@@ -100,3 +100,10 @@ Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Ai
 - Volver al mes actual aparece en meses anteriores/futuros, mantiene la pestaña y desaparece al regresar. Mes consultado se conserva entre pestañas.
 - Chromium 390 px: octubre→septiembre; mantiene septiembre en Efectivo; regreso a octubre sin salir de Efectivo; botón para mes futuro; Historial abre mes elegido; sin desbordamiento.
 - La actualización previa de Historial/Movimientos figura built en Pages (8144e0f). Verificar por HTTP esta nueva actualización antes de afirmar publicada.
+
+## Simplificación de navegación
+
+- El usuario indica que la navegación mensual elimina la necesidad de Historial; retirada su pestaña. Movimientos se conserva.
+- Pestañas: Inicio, Efectivo, Virtual, Evolución, Respaldo, Movimientos. Flechas y regreso al actual conservan consulta histórica.
+- Chromium a 390 px: seis pestañas; septiembre persiste al entrar en Movimientos; regresar a octubre mantiene Movimientos; sin desbordamiento.
+- Selector con flechas anterior (56c38b2) verificado publicado HTTP 200 y comparación de archivos. Nueva simplificación en proceso de publicación.

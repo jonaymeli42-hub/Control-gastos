@@ -131,3 +131,9 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Mes y año claramente visibles en el centro, flechas anterior/siguiente a los lados, tomando como referencia visual la captura de Control de tarjetas enviada por usuario (sin copiar sus datos).
 - Si el mes seleccionado no es el actual, mostrar Volver al mes actual; debe funcionar tanto para meses anteriores como futuros y volver manteniendo la pestaña. Al volver al mes actual el botón desaparece.
 - Conservar consulta del mes seleccionado entre las pestañas, sin arrastre automático. Permitir elegir un mes directamente tocando el nombre.
+
+## Corrección posterior: consulta histórica sin pestaña propia
+
+- Con las flechas mensuales, el usuario indica eliminar la pestaña Historial. Esta corrección reemplaza la decisión anterior de mantener dos pestañas nuevas.
+- Pestañas finales acordadas: Inicio, Efectivo, Virtual, Evolución, Respaldo y Movimientos.
+- Se mantiene consulta de meses anteriores mediante flechas y selección directa, contexto de mes elegido entre pantallas y Volver al mes actual. No se elimina ningún mes ni movimiento.
