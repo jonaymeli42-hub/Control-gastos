@@ -124,4 +124,10 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 - Mostrar claramente el mes histórico y una acción Volver al mes actual. No hay arrastre de saldos.
 - Agregar pestaña Movimientos con todas las operaciones de Efectivo y Virtual, propias/ajenas, transferencias, pases y Ahorro / Préstamos. Consultar por mes y fecha. Transferencias/pases vinculados aparecen una sola vez en la vista conjunta; sus efectos siguen visibles en los saldos correspondientes.
 - Evolución continúa mostrando solo dinero propio, independiente de la vista conjunta.
-- Navegación de Historial/Movimientos pendiente de preferencia del usuario; demostración inicial incluye ambas vistas como pestañas, con etiquetas legibles.
+- Preferencia confirmada: Historial y Movimientos son dos pestañas diferentes.
+
+## Selector mensual visual
+
+- Mes y año claramente visibles en el centro, flechas anterior/siguiente a los lados, tomando como referencia visual la captura de Control de tarjetas enviada por usuario (sin copiar sus datos).
+- Si el mes seleccionado no es el actual, mostrar Volver al mes actual; debe funcionar tanto para meses anteriores como futuros y volver manteniendo la pestaña. Al volver al mes actual el botón desaparece.
+- Conservar consulta del mes seleccionado entre las pestañas, sin arrastre automático. Permitir elegir un mes directamente tocando el nombre.

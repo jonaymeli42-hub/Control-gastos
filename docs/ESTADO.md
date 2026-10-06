@@ -92,3 +92,11 @@ Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Ai
 - Prueba Chromium a 390 px: septiembre conservado en Inicio/Efectivo/Virtual/Movimientos; listado septiembre 2 registros; salida explícita vuelve a octubre; transferencia conjunta una sola fila; sin desbordamiento.
 - Corrección anterior de pase entre meses conservada. No afecta Firebase ni otras apps.
 - El despliegue anterior de Pages permanece esperando en GitHub; no afirmar estas vistas publicadas hasta comprobar archivos remotos.
+
+## Selector mensual con flechas
+
+- Usuario confirmó dos pestañas separadas: Historial y Movimientos.
+- Nueva navegación visual con mes/año centrados y flechas anterior/siguiente en Inicio, Efectivo, Virtual, Historial y Movimientos. Tocar el nombre permite salto directo.
+- Volver al mes actual aparece en meses anteriores/futuros, mantiene la pestaña y desaparece al regresar. Mes consultado se conserva entre pestañas.
+- Chromium 390 px: octubre→septiembre; mantiene septiembre en Efectivo; regreso a octubre sin salir de Efectivo; botón para mes futuro; Historial abre mes elegido; sin desbordamiento.
+- La actualización previa de Historial/Movimientos figura built en Pages (8144e0f). Verificar por HTTP esta nueva actualización antes de afirmar publicada.
