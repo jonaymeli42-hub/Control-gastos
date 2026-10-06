@@ -34,3 +34,10 @@ Clonar jonaymeli42-hub/Control-gastos, leer esta documentación y comprobar perm
 - Usuario completó acceso Google. Configuración privada _config/access.ownerUid confirmada por captura, sin publicar identificador personal.
 - npm run test:rules pasó 6/6 tests en emulador local (2026-10-06). Reglas de diagnóstico probadas; publicación de reglas en Firebase y prueba real pendientes.
 - No se cargaron movimientos reales ni se conectó Drive.
+
+## Respaldos: implementación recibida
+
+- Worker completo suministrado por usuario, referencia con sangría normalizada conservada en worker/original.js.
+- Adaptación propuesta en worker/worker.js; 7/7 pruebas mock correctas. No desplegada.
+- Prueba Firebase real confirmada por captura: escritura, lectura desde servidor y eliminación del diagnóstico ficticio completas.
+- Pendientes: denegación real con segunda cuenta, prueba desde segundo dispositivo, OAuth Prueba/Producción, callback y cliente Gastos, despliegue del Worker, ciclo completo con restauración ficticia.
