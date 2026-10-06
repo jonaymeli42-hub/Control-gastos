@@ -144,3 +144,6 @@ Respaldo ocupa la última posición de la barra. La navegación sigue en una sol
 
 ### Barra compacta fija y acceso superior al respaldo
 Respaldo deja de ser una pestaña inferior y se abre desde un botón junto al selector de tema del encabezado. Las seis pestañas inferiores quedan fijas en una sola fila compacta sin desplazamiento horizontal: Inicio, Efectivo, Virtual, Evolución, Movimientos y Categorías.
+
+
+Se fija el ancho del botón Claro/Oscuro para mantener la posición de los controles e iconos al cambiar de tema.
