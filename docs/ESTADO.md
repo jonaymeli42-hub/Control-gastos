@@ -163,3 +163,6 @@ Respaldo deja de ser una pestaña inferior y se abre desde un botón junto al se
 
 
 Se fija el ancho del botón Claro/Oscuro para mantener la posición de los controles e iconos al cambiar de tema.
+
+
+Usuario informa que Chrome considera Gastos instalada pero Android no muestra la app. Rechaza acceso directo y borrar datos de Chrome. Preparada identidad nueva y página instalar.html con arranque propio y manifest gastos-v2.webmanifest para intentar una instalación independiente del registro anterior. Mantiene Firebase y Drive existentes. Pendiente de probar en el teléfono; no afirmar reparación del navegador antes de confirmación.

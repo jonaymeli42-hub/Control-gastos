@@ -14,3 +14,8 @@ En iPhone: abrir app.html en Safari → Compartir → Agregar a inicio.
 El manifest configura nombre, iconos, alcance y apertura standalone. No hay service worker ni caché de datos financieros. Instalarla no habilita guardado sin Internet ni copias con la app cerrada. Se mantiene la sesión de navegador configurada, sin pasar a una sesión permanente de autenticación.
 
 Los controles de cuenta se abren tocando el icono de persona junto al selector de tema: Cerrar sesión, Revisar conexión y detalles del estado. Cuando está conectada, la pantalla principal muestra únicamente un pequeño indicador. Al salir de la sesión vuelve a aparecer el acceso con Google.
+
+
+## Chrome indica instalada pero no existe en Android
+
+Se prepara una identidad de instalación distinta (`gastos-instalacion-v2`), con manifest nuevo y URL de inicio `instalar.html`, para intentar evitar que Chrome reutilice el registro anterior. Abrir https://jonaymeli42-hub.github.io/Control-gastos/instalar.html e intentar Instalar aplicación. El enlace carga la misma aplicación privada y usa la misma cuenta y Firestore; no es la demostración ni un acceso directo. La efectividad en el teléfono afectado requiere comprobar que Android completa la instalación: publicar un manifest nuevo no acredita reparar el estado interno de Chrome. No se borran datos, sesiones, registros ni conexiones de las otras apps.
