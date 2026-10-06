@@ -1,8 +1,9 @@
 # Control de gastos
 
-Aplicación personal nueva en preparación. Todavía no hay una aplicación publicada ni una base de datos configurada.
+Aplicación personal nueva en preparación. Página inicial de acceso publicada en GitHub Pages; Firestore creado. Aplicación financiera y respaldos aún en preparación.
 
 - [Especificación vigente](docs/ESPECIFICACION.md)
+- [Primera prueba de acceso privado](docs/PRUEBA-ACCESO.md)
 - [Estado y continuación del trabajo](docs/ESTADO.md)
 - [Configuración de Firebase desde el teléfono](docs/FIREBASE.md)
 

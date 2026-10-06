@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null
+        && request.auth.uid == uid
+        && get(/databases/$(database)/documents/_config/access).data.ownerUid == uid;
+    }
+    // Only a fictitious diagnostic record is enabled at this stage.
+    match /users/{uid}/diagnostics/access-check {
+      allow get, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['kind', 'updatedAt'])
+        && request.resource.data.kind == 'fictitious-access-check'
+        && request.resource.data.updatedAt == request.time;
+    }
+    // Configuration is administrator-only; all other app data remains blocked.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

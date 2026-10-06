@@ -47,3 +47,29 @@ document.getElementById('copy').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(uid.value); status.textContent = 'Identificador copiado. Pegalo en esta conversación de Codex.'; }
   catch { uid.focus(); uid.select(); status.textContent = 'Mantené presionado el identificador para copiarlo.'; }
 });
+
+// No personal identifiers are embedded in this source.
+const testButton = document.getElementById('test-access');
+const testStatus = document.getElementById('test-status');
+testButton.addEventListener('click', async () => {
+  const user = auth.currentUser;
+  if (!user) { testStatus.textContent = 'Primero entrá con Google.'; return; }
+  testButton.disabled = true;
+  testStatus.textContent = 'Comprobando acceso…';
+  let saved = false;
+  try {
+    const { getFirestore, doc, setDoc, getDocFromServer, deleteDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js');
+    const db = getFirestore(app);
+    const ref = doc(db, 'users', user.uid, 'diagnostics', 'access-check');
+    await setDoc(ref, {kind: 'fictitious-access-check', updatedAt: serverTimestamp()});
+    saved = true;
+    testStatus.textContent = 'Guardado confirmado en Firebase. Comprobando lectura…';
+    const snapshot = await getDocFromServer(ref);
+    if (!snapshot.exists() || snapshot.data().kind !== 'fictitious-access-check') throw new Error('invalid-diagnostic');
+    await deleteDoc(ref);
+    testStatus.textContent = 'Prueba completa: guardado y lectura confirmados en Firebase; registro ficticio eliminado. Todavía no se probó el respaldo en Drive.';
+  } catch (error) {
+    const detail = error.code === 'permission-denied' ? 'Permiso denegado: revisá las reglas publicadas y la configuración de la cuenta.' : `No se completó la prueba (${error.code || error.message || 'error'}).`;
+    testStatus.textContent = (saved ? 'Firebase confirmó el guardado, pero falta completar lectura o limpieza. ' : '') + detail;
+  } finally { testButton.disabled = false; }
+});

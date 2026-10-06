@@ -27,3 +27,10 @@ Publicar página mínima de inicio de sesión en Pages, comprobar archivos y obt
 ## Retomar otra sesión
 
 Clonar jonaymeli42-hub/Control-gastos, leer esta documentación y comprobar permisos, estado remoto y configuración vigente. No reutilizar credenciales de otra sesión ni asumir que pruebas pendientes pasaron. No tocar las otras apps.
+
+## Actualización de configuración
+
+- Pages activado por el usuario; publicación inicial y cuatro archivos verificados por HTTP 200 y comparación de contenido.
+- Usuario completó acceso Google. Configuración privada _config/access.ownerUid confirmada por captura, sin publicar identificador personal.
+- npm run test:rules pasó 6/6 tests en emulador local (2026-10-06). Reglas de diagnóstico probadas; publicación de reglas en Firebase y prueba real pendientes.
+- No se cargaron movimientos reales ni se conectó Drive.
