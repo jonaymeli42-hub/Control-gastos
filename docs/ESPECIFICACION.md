@@ -167,3 +167,7 @@ Validado en navegador móvil: categoría nueva, gasto categorizado, edición de 
 
 ### Detalle de categorías y navegación horizontal
 Cada categoría despliega sus gastos del mes seleccionado, con fecha, ubicación, descripción e importe. Los gastos del detalle permiten editar y eliminar desde el mismo formulario. Las categorías vacías indican que no hay gastos en ese mes. La barra inferior ocupa una sola fila y permite desplazamiento horizontal, manteniendo visible la pestaña activa. Sigue siendo una demostración con datos ficticios en memoria.
+
+
+### Visibilidad de Evolución y barra inferior
+Respaldo ocupa la última posición de la barra. La navegación sigue en una sola fila deslizable, ahora con contenedor flotante redondeado, iconos y texto de mayor tamaño y pestaña activa resaltada. Evolución presenta cada mes como tarjeta con cuatro totales claramente rotulados, en dos columnas en celular y cuatro en pantallas amplias; conserva el despliegue de detalles y el regreso al mes actual al volver a la pestaña. Datos ficticios en memoria.
