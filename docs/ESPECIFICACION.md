@@ -163,3 +163,7 @@ La demostración agrega una pestaña Categorías independiente: crear, renombrar
 Todos los registros de la demostración pueden editarse y eliminarse tocándolos en Efectivo, Virtual o Movimientos: ingresos propios y aportes, gastos, Ahorro / Préstamos, transferencias y pases entre meses. Se permite cambiar importe, descripción, fecha, ubicación, tipo y categoría cuando corresponde. Eliminar requiere confirmación; transferencias y pases se editan o eliminan como una sola operación con dos partes. Los saldos y totales se recalculan.
 
 Validado en navegador móvil: categoría nueva, gasto categorizado, edición de importe y total, eliminación de categoría conservando gasto, eliminación de gasto y actualización de ambas partes de una transferencia. La demostración sigue usando datos ficticios en memoria; recargar descarta cambios. Estas pantallas aún no guardan datos financieros en Firebase.
+
+
+### Detalle de categorías y navegación horizontal
+Cada categoría despliega sus gastos del mes seleccionado, con fecha, ubicación, descripción e importe. Los gastos del detalle permiten editar y eliminar desde el mismo formulario. Las categorías vacías indican que no hay gastos en ese mes. La barra inferior ocupa una sola fila y permite desplazamiento horizontal, manteniendo visible la pestaña activa. Sigue siendo una demostración con datos ficticios en memoria.
