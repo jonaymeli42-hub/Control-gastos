@@ -166,3 +166,6 @@ Se fija el ancho del botón Claro/Oscuro para mantener la posición de los contr
 
 
 Usuario informa que Chrome considera Gastos instalada pero Android no muestra la app. Rechaza acceso directo y borrar datos de Chrome. Preparada identidad nueva y página instalar.html con arranque propio y manifest gastos-v2.webmanifest para intentar una instalación independiente del registro anterior. Mantiene Firebase y Drive existentes. Pendiente de probar en el teléfono; no afirmar reparación del navegador antes de confirmación.
+
+
+El usuario confirmó que pudo instalar Gastos con la nueva identidad, sin borrar datos de Chrome. Pide cargar sueldos diarios de días anteriores de octubre: el formulario ahora permite elegir fecha al crear, con hoy como valor inicial y ubicación Efectivo/origen propio conservados. Cambios compartidos por app.html, instalar.html y demo.html.

@@ -57,7 +57,7 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 
 ### Sueldo diario y movimientos
 
-- Sueldo: solo importe y guardar; ingreso propio en Efectivo hoy. No pedir ubicación ni fecha en carga habitual. Editar importe/fecha después.
+- Sueldo: importe y fecha preseleccionada en hoy, editable para cargar días anteriores desde el mismo formulario. Siempre ingreso propio en Efectivo, sin pedir ubicación. También se puede editar después.
 - Movimiento determina ubicación por botón. Tipos: gasto; otro ingreso (incluidos fijos); transferencia a otra ubicación; pase a otro mes; enviar a Ahorro / Préstamos; traer desde Ahorro / Préstamos.
 - Importe, descripción y fecha actual editable. Ingresos: Propio por defecto o Aporte de otra persona. Gastos: importe completo, sin clasificar por persona. No exigir campos innecesarios.
 
