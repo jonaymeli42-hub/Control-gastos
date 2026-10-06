@@ -59,3 +59,31 @@ test('sandbox accepts only fixed fictitious values and monotonic revisions', asy
  await assertFails(getDoc(doc(env.authenticatedContext(other).firestore(),`users/${owner}/diagnostics/backup-check`)));
  await assertFails(setDoc(doc(env.authenticatedContext(other).firestore(),`users/${other}/diagnostics/backup-check`),value(12345,1)));
 });
+
+// Financial storage is isolated from the existing fictitious diagnostics.
+const financialPath = `users/${owner}/financial/ledger`;
+const ledgerData = () => ({operations:[],categories:[{id:'uncategorized',name:'Sin categoría'}]});
+const financial = (revision=1,lastMutationId='mutation-1') => ({schemaVersion:1,revision,lastMutationId,ledger:ledgerData(),updatedAt:serverTimestamp()});
+test('only owner can read and write the financial ledger; anonymous and other accounts are rejected', async()=>{
+ const db=env.authenticatedContext(owner).firestore(),ref=doc(db,financialPath);
+ await assertSucceeds(getDoc(ref));await assertSucceeds(setDoc(ref,financial()));
+ for(const otherDb of [env.unauthenticatedContext().firestore(),env.authenticatedContext(other).firestore()]){await assertFails(getDoc(doc(otherDb,financialPath)));await assertFails(setDoc(doc(otherDb,financialPath),financial(2,'mutation-2')));}
+ await assertFails(setDoc(doc(env.authenticatedContext(other).firestore(),`users/${other}/financial/ledger`),financial()));
+ await assertFails(getDocs(collection(db,`users/${owner}/financial`)));await assertFails(deleteDoc(ref));
+});
+test('financial schema, server timestamp and increasing revision are mandatory',async()=>{
+ const ref=doc(env.authenticatedContext(owner).firestore(),financialPath);
+ await assertFails(setDoc(ref,financial(2)));await assertFails(setDoc(ref,{...financial(),schemaVersion:2}));await assertFails(setDoc(ref,{...financial(),extra:'unknown'}));await assertFails(setDoc(ref,{...financial(),updatedAt:new Date(0)}));await assertFails(setDoc(ref,{...financial(),ledger:{operations:[],categories:[]}}));
+ await assertSucceeds(setDoc(ref,financial()));await assertFails(setDoc(ref,financial()));await assertFails(setDoc(ref,financial(2)));await assertSucceeds(setDoc(ref,financial(2,'mutation-2')));await assertFails(setDoc(ref,financial(4,'mutation-3')));
+});
+test('repository transactions reject concurrent overwrite and a repeated mutation does not duplicate',async()=>{
+ const {createLedgerRepository}=await import('../ledger-repository.js');const sdk=await import('firebase/firestore');
+ const db=env.authenticatedContext(owner).firestore(),repo=createLedgerRepository(db,owner,sdk);
+ const initial=await repo.read();if(initial.revision!==0)throw new Error('Unexpected initial revision');
+ const data=ledgerData();data.operations.push({id:'stable-transfer',kind:'transfer',description:'Fictitious transfer',legs:[{location:'cash',date:'2026-10-06',cents:-400000},{location:'virtual',date:'2026-10-06',cents:400000}]});
+ const saved=await repo.save(data,0,'first-mutation');if(saved.revision!==1)throw new Error('Missing confirmed save');
+ const repeated=await repo.save(data,0,'first-mutation');if(repeated.revision!==1)throw new Error('Repeated mutation duplicated');
+ const a=structuredClone(data),b=structuredClone(data);a.operations[0].description='Device A';b.operations[0].description='Device B';
+ const results=await Promise.allSettled([repo.save(a,1,'device-a'),repo.save(b,1,'device-b')]);if(results.filter(r=>r.status==='fulfilled').length!==1||results.filter(r=>r.status==='rejected'&&r.reason.code==='ledger/conflict').length!==1)throw new Error('Concurrency protection failed');
+ const current=await repo.read();if(current.revision!==2||current.ledger.operations[0].legs.length!==2)throw new Error('Incomplete linked transfer');
+});

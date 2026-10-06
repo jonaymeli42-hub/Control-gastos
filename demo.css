@@ -46,3 +46,5 @@ nav{width:calc(100% - 24px);max-width:696px;bottom:max(12px,env(safe-area-inset-
 
 /* Reserve equal space for Claro and Oscuro so theme changes never shift controls. */
 #theme{width:76px;min-width:76px;max-width:76px;flex:0 0 76px;text-align:center;white-space:nowrap}.header-actions{flex-wrap:nowrap}#open-backup svg,.nav-icon{flex-shrink:0}
+
+.live-access{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:20px;font-size:12px}.access-actions,.drive-actions{display:flex;flex-wrap:wrap;gap:8px}.live-access button,.drive-actions button,.category-actions button,[data-drive-files] button,#rules-help button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:9px 11px;min-height:40px}button:disabled{opacity:.55;cursor:wait}#rules-help{padding-top:12px;border-top:1px solid var(--line)}[data-drive-files]{padding-left:18px;font-size:12px}[data-drive-files] li{overflow-wrap:anywhere;padding:12px 0}[data-drive-files] button{margin:6px 6px 0 0}.drive-note{font-size:12px;color:var(--muted)}

@@ -28,6 +28,33 @@ service cloud.firestore {
             || (exists(/databases/$(database)/documents/users/$(uid)/diagnostics/backup-check)
               && request.resource.data.revision == resource.data.revision + 1));
     }
+    // One private atomic ledger. Unknown paths, queries and full-document deletion stay blocked.
+    // Detailed financial validation runs in ledger-model.js; only the configured owner can write.
+    match /users/{uid}/financial/ledger {
+      function validLedger() {
+        return request.resource.data.keys().hasAll(['schemaVersion', 'revision', 'lastMutationId', 'ledger', 'updatedAt'])
+          && request.resource.data.keys().hasOnly(['schemaVersion', 'revision', 'lastMutationId', 'ledger', 'updatedAt'])
+          && request.resource.data.schemaVersion == 1
+          && request.resource.data.revision is int
+          && request.resource.data.revision >= 1
+          && request.resource.data.lastMutationId is string
+          && request.resource.data.lastMutationId.matches('[A-Za-z0-9_-]{1,100}')
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.ledger is map
+          && request.resource.data.ledger.keys().hasAll(['operations', 'categories'])
+          && request.resource.data.ledger.keys().hasOnly(['operations', 'categories'])
+          && request.resource.data.ledger.operations is list
+          && request.resource.data.ledger.operations.size() <= 4000
+          && request.resource.data.ledger.categories is list
+          && request.resource.data.ledger.categories.size() > 0
+          && request.resource.data.ledger.categories.size() <= 100;
+      }
+      allow get: if isOwner(uid);
+      allow create: if isOwner(uid) && validLedger() && request.resource.data.revision == 1;
+      allow update: if isOwner(uid) && validLedger()
+        && request.resource.data.revision == resource.data.revision + 1
+        && request.resource.data.lastMutationId != resource.data.lastMutationId;
+    }
     // Configuration is administrator-only; all other app data remains blocked.
     match /{document=**} {
       allow read, write: if false;

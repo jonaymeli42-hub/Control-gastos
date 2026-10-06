@@ -82,7 +82,7 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 
 - Opciones rápidas reutilizables para ingresos/gastos, administración y modificación de importe en cada registro.
 - Registro MANUAL cuando se cobra/paga; jamás generación automática por fecha.
-- Opciones iniciales acordadas: «Sueldo de Melanie» y «Sueldo de Misael», sin importes reales. Crear en los datos privados, no como datos personales en el código público.
+- Opciones iniciales: los dos sueldos acordados, cuyos nombres e importes se configurarán únicamente en los datos privados. No incorporar nombres personales al código público.
 
 ### Aportes de otras personas — modelo definitivo acordado
 
@@ -105,7 +105,7 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 
 ### Evolución
 
-- Lista MUY compacta por mes, combinando Efectivo + Virtual.
+- Tarjetas mensuales amplias con importes legibles, combinando Efectivo + Virtual.
 - Fila: mes, ingresos propios, aportes de otras personas, gastos completos y neto destinado a Ahorro / Préstamos.
 - Tocar despliega importes exactos, detalle de ingresos/aportes/pagos y cálculo gastos − aportes recibidos del mes.
 - Excluir transferencias y pases de totales de ingresos/gastos; nunca contarlos dos veces.
@@ -115,7 +115,7 @@ Una contabilidad personal, ubicaciones Efectivo y Virtual. Nunca llamar Galicia 
 ## Edición, aspecto y aceptación
 
 - Todos los registros editables/eliminables; confirmar eliminación, recalcular saldos/resúmenes, conservar vínculos entre las partes de transferencias y pases.
-- Pestañas Inicio, Efectivo, Virtual, Evolución, Respaldo y Movimientos.
+- Pestañas inferiores fijas Inicio, Efectivo, Virtual, Evolución, Movimientos y Categorías; Respaldo como botón superior junto al tema.
 - Botón pequeño de tema arriba en TODAS las pestañas, solo Claro/Oscuro; persistir elección coherentemente.
 - Celular compacto, legible y adaptable a computadora; navegación clara y carga sencilla.
 - Mostrar diseño con datos ficticios identificados y permitir correcciones antes de completar interfaz.
@@ -175,3 +175,8 @@ Respaldo ocupa la última posición de la barra. La navegación sigue en una sol
 
 ### Barra compacta fija y acceso superior al respaldo
 Respaldo deja de ser una pestaña inferior y se abre desde un botón junto al selector de tema del encabezado. Las seis pestañas inferiores quedan fijas en una sola fila compacta sin desplazamiento horizontal: Inicio, Efectivo, Virtual, Evolución, Movimientos y Categorías.
+
+
+## Activación del guardado del diseño aprobado
+
+El usuario aprobó el diseño y autorizó conectar movimientos, categorías, edición/eliminación y respaldo con Firebase. `app.html` reutiliza la interfaz sin ejemplos financieros; `demo.html` permanece como demostración aislada. Todos los cambios se validan y confirman mediante transacción de un documento privado y una revisión creciente. Restauración completa validada con checksum, confirmación, copia previa y control de revisión. La publicación de reglas en el proyecto real requiere acceso administrativo; se guía con botón de copia y documento ACTIVAR-GUARDADO.md. Las pruebas en emulador y navegador no equivalen a confirmación en producción.

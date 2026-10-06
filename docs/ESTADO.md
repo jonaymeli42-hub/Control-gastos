@@ -1,3 +1,13 @@
+## Estado vigente: guardado privado del diseño aprobado
+
+Implementados `app.html`, validación monetaria y de vínculos, transacciones atómicas con revisión, categorías privadas, edición/eliminación, lectura de servidor y sincronización mediante listener. Respaldo completo con categorías y modo financial compatible con el Worker publicado, descarga JSON y restauración con copia previa y conflicto de revisión. La demostración sigue separada.
+
+Pruebas: modelo/respaldo/Worker 16 aprobadas, reglas de Firestore 10 aprobadas en emulador (incluye acceso de otra cuenta y concurrencia), navegador con adaptador simulado confirma recarga, categorías, errores sin pérdida de formulario, conflictos y copia previa de restauración. Estabilidad del diseño y tema conservada.
+
+Pendiente del usuario: publicar las reglas completas con la consola de Firebase y probar guardado, recarga y ciclo de copia/recuperación en el proyecto real. Se intentó despliegue no interactivo y Firebase rechazó autenticación porque no existen credenciales administrativas en el entorno. Instrucciones en docs/ACTIVAR-GUARDADO.md y panel de acceso de app.html. No afirmar que los movimientos de producción ya están habilitados. Opciones fijas e instalación siguen pendientes.
+
+---
+
 # Estado del proyecto
 
 ## Verificado — 2026-10-06

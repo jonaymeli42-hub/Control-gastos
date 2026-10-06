@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const BASE = 'https://respaldo-mis-apps.soft-bush-7594.workers.dev';
-  let app, key, getBackup, timer, retry = 5000, busy = false, message = '', callbackBusy = false;
+  let app, key, getBackup, restoreEvent='gastos:restore-test', restoreLabel='Restaurar prueba', returnTo, timer, retry = 5000, busy = false, message = '', callbackBusy = false;
   const read = () => { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } };
   const write = state => { localStorage.setItem(key, JSON.stringify(state)); paint(); };
   const b64 = bytes => btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
@@ -38,7 +38,7 @@
     busy = true; message = ''; paint();
     try {
       const backup = await getBackup();
-      const fingerprint = await hash(JSON.stringify(backup.data));
+      const fingerprint = await hash(JSON.stringify(backup.mode==='financial'?{mode:backup.mode,revision:backup.revision,data:backup.data}:backup.data));
       if (fingerprint === state.hash) {
         const current = read(); if (current.revision === state.revision) write({ ...current, pending: false });
       } else {
@@ -53,9 +53,10 @@
     finally { busy = false; paint(); if (read().pending && !read().reconnect) schedule(retry); }
   }
   async function connect() {
+    if(returnTo)sessionStorage.setItem(key+':return-to',returnTo);else sessionStorage.removeItem(key+':return-to');
     const verifier = b64(crypto.getRandomValues(new Uint8Array(32)));
     sessionStorage.setItem(key + ':verifier', verifier);
-    localStorage.setItem(key + ':pending-auth', JSON.stringify({ verifier, expires: Date.now() + 600000 }));
+    localStorage.setItem(key + ':pending-auth', JSON.stringify({ verifier, returnTo, expires: Date.now() + 600000 }));
     const result = await api('/auth/start', { app, proof: await hash(verifier) }, false);
     const target = new URL(result.url);
     if (target.origin !== 'https://accounts.google.com' || target.pathname !== '/o/oauth2/v2/auth') throw new Error('Respuesta de conexión inválida.');
@@ -73,8 +74,9 @@
     const state = read();
     for (const host of document.querySelectorAll('[data-drive-backup]')) {
       if (!host.querySelector('[data-drive-status]')) {
-        host.innerHTML = '<h3>Respaldo privado en Google Drive</h3><p data-drive-status role="status" aria-live="polite"></p><p data-drive-last></p><div class="drive-actions"><button type="button" data-drive-action="connect">Conectar con Google</button><button type="button" data-drive-action="save">Crear copia ahora</button><button type="button" data-drive-action="disconnect">Desconectar este dispositivo</button><a href="drive-respaldos.html">Ver y descargar copias</a></div><p class="drive-note">Requiere la app abierta e Internet. Conservá también copias manuales. No se restauran datos automáticamente.</p>';
+        host.innerHTML = '<h3>Respaldo privado en Google Drive</h3><p data-drive-status role="status" aria-live="polite"></p><p data-drive-last></p><div class="drive-actions"><button type="button" data-drive-action="connect">Conectar con Google</button><button type="button" data-drive-action="save">Crear copia ahora</button><button type="button" data-drive-action="disconnect">Desconectar este dispositivo</button><a data-drive-list-link href="drive-respaldos.html">Ver y descargar copias</a></div><p class="drive-note">Requiere la app abierta e Internet. Conservá también copias manuales. No se restauran datos automáticamente.</p>';
       }
+      host.querySelector('[data-drive-list-link]').hidden=!!returnTo;
       host.querySelector('[data-drive-status]').textContent = state.reconnect ? 'Necesitás reconectar con Google.' : !state.token ? 'Drive desconectado. El estado de Firebase se comprueba por separado.' : busy ? 'Enviando copia…' : !getBackup ? 'Conexión con Drive confirmada; sin creación de copias habilitada aquí.' : state.pending ? 'Pendiente de respaldo.' : state.last ? 'Última copia confirmada.' : 'Conexión con Drive confirmada; todavía no se creó una copia.';
       host.querySelector('[data-drive-last]').textContent = (state.last ? 'Última copia confirmada: ' + new Date(state.last).toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour12: false }) + '. ' : '') + message;
       host.querySelector('[data-drive-action="connect"]').hidden = !!state.token && !state.reconnect;
@@ -101,13 +103,13 @@
           if (app !== 'gastos' || backup.format !== 'control-gastos-backup' || backup.schemaVersion !== 1 || backup.complete !== true || !Array.isArray(backup.data?.operations) || !Array.isArray(backup.data?.cases) || !Array.isArray(backup.data?.templates)) throw new Error('El archivo no corresponde a esta app.');
           const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
           const link = document.createElement('a'); link.href = url; link.download = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_'); document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-          message = 'Descarga solicitada. La restauración validada todavía está en preparación.'; paint();
+          message = 'Descarga solicitada. Comprobá el archivo en Descargas.'; paint();
         } catch (error) { failure(error); } finally { button.disabled = false; }
       };
-      const restore = document.createElement('button'); restore.type = 'button'; restore.textContent = 'Restaurar prueba';
+      const restore = document.createElement('button'); restore.type = 'button'; restore.textContent = restoreLabel;
       restore.onclick = async () => {
         restore.disabled = true;
-        try { const backup = await api('/backups/download?id=' + encodeURIComponent(file.id)); window.dispatchEvent(new CustomEvent('gastos:restore-test', { detail: backup })); }
+        try { const backup = await api('/backups/download?id=' + encodeURIComponent(file.id)); window.dispatchEvent(new CustomEvent(restoreEvent, { detail: backup })); }
         catch (error) { failure(error); } finally { restore.disabled = false; }
       };
       if (getBackup) row.append(label, button, restore); else row.append(label, button);
@@ -130,12 +132,12 @@
       write({ token: result.token, pending: true, revision: (previous.revision || 0) + 1, last: previous.last });
       sessionStorage.removeItem(key + ':verifier');
       localStorage.removeItem(key + ':pending-auth');
-      location.replace('./drive-respaldos.html?connected=1');
+      const target=sessionStorage.getItem(key+':return-to')||(pending?.expires>Date.now()?pending.returnTo:null);sessionStorage.removeItem(key+':return-to');location.replace(target==='app.html'?'./app.html?connected=1':'./drive-respaldos.html?connected=1');
     } catch (error) { failure(error); const status = document.querySelector('[data-callback-status]'); if (status) status.textContent = message; }
     finally { callbackBusy = false; }
   }
   function init(options) {
-    app = options.app; key = 'private-drive-backup:' + app; getBackup = options.getBackup;
+    app = options.app; key = 'private-drive-backup:' + app; getBackup = options.getBackup; restoreEvent=options.restoreEvent||'gastos:restore-test';restoreLabel=options.restoreLabel||'Restaurar prueba';returnTo=options.returnTo;
     paint();
     new MutationObserver(() => { if ([...document.querySelectorAll('[data-drive-backup]')].some(host => !host.querySelector('[data-drive-status]'))) paint(); }).observe(document.body, { childList: true, subtree: true });
     document.addEventListener('click', async event => {
