@@ -171,3 +171,7 @@ Cada categoría despliega sus gastos del mes seleccionado, con fecha, ubicación
 
 ### Visibilidad de Evolución y barra inferior
 Respaldo ocupa la última posición de la barra. La navegación sigue en una sola fila deslizable, ahora con contenedor flotante redondeado, iconos y texto de mayor tamaño y pestaña activa resaltada. Evolución presenta cada mes como tarjeta con cuatro totales claramente rotulados, en dos columnas en celular y cuatro en pantallas amplias; conserva el despliegue de detalles y el regreso al mes actual al volver a la pestaña. Datos ficticios en memoria.
+
+
+### Barra compacta fija y acceso superior al respaldo
+Respaldo deja de ser una pestaña inferior y se abre desde un botón junto al selector de tema del encabezado. Las seis pestañas inferiores quedan fijas en una sola fila compacta sin desplazamiento horizontal: Inicio, Efectivo, Virtual, Evolución, Movimientos y Categorías.
