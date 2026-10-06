@@ -174,3 +174,6 @@ El usuario confirmó que pudo instalar Gastos con la nueva identidad, sin borrar
 El usuario informa que debe volver a entrar con Google tras cada cierre. Se cambia la persistencia de Firebase Auth de sesión a local tanto en la app como en configuración, para no degradarla al visitar index.html. Se mantiene Cerrar sesión y se fuerza nueva URL del módulo de acceso para evitar cargar la configuración anterior de caché. No se cambia el almacenamiento de registros financieros ni las reglas.
 
 Verificación de persistencia con Firebase Auth SDK real y Authentication Emulator: un usuario ficticio continúa conectado al cerrar la ventana y abrir otra nueva; después de Cerrar sesión, otra apertura queda sin sesión. No se usaron credenciales ni datos del proyecto real en esta prueba.
+
+
+Pase entre meses actualizado para fechas completas de salida/entrada; ya no calcula obligatoriamente fin/inicio del mes al guardar. Edición carga ambas fechas originales sin modificarlas, y se valida que sean meses diferentes. Interfaz aplicada a app.html, instalar.html y demo.html.

@@ -188,3 +188,7 @@ El usuario pide ocultar el panel permanente de Cerrar sesión/Revisar conexión:
 
 ## Mantener la sesión al cerrar la app
 El usuario pide no volver a conectar Google en cada apertura. Firebase Auth usa persistencia local en este dispositivo, también en la configuración. Cerrar sesión sigue eliminando la sesión guardada. Los movimientos siguen privados en Firestore y sin almacenamiento financiero persistente local.
+
+
+## Fechas exactas en los pases entre meses
+El usuario pide elegir día, mes y año al pasar dinero. El formulario de pase muestra Fecha de salida y Fecha de entrada, que deben pertenecer a meses diferentes. Se registran las dos fechas elegidas, en la misma ubicación y con importes opuestos, como una sola operación. Al editar se conservan las fechas exactas existentes. Los rótulos Para/Desde incluyen el día de la contraparte.
