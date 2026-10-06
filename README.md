@@ -1,7 +1,8 @@
 # Control de gastos
 
-Aplicación personal con diseño aprobado, guardado privado en Firestore y respaldo completo en el Worker de Google Drive existente. Activación pendiente de publicar las nuevas reglas en el proyecto real y comprobar el primer ciclo desde la cuenta autorizada.
+Aplicación personal con diseño aprobado, guardado privado en Firestore y respaldo completo en el Worker de Google Drive existente. El usuario confirmó el guardado y el ciclo de recuperación en el proyecto real desde la cuenta autorizada.
 
+- [Instalar y abrir en el teléfono](docs/INSTALAR.md)
 - [Activar el guardado desde el teléfono](docs/ACTIVAR-GUARDADO.md)
 - [Especificación vigente](docs/ESPECIFICACION.md)
 - [Primera prueba de acceso privado](docs/PRUEBA-ACCESO.md)

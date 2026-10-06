@@ -180,3 +180,7 @@ Respaldo deja de ser una pestaña inferior y se abre desde un botón junto al se
 ## Activación del guardado del diseño aprobado
 
 El usuario aprobó el diseño y autorizó conectar movimientos, categorías, edición/eliminación y respaldo con Firebase. `app.html` reutiliza la interfaz sin ejemplos financieros; `demo.html` permanece como demostración aislada. Todos los cambios se validan y confirman mediante transacción de un documento privado y una revisión creciente. Restauración completa validada con checksum, confirmación, copia previa y control de revisión. La publicación de reglas en el proyecto real requiere acceso administrativo; se guía con botón de copia y documento ACTIVAR-GUARDADO.md. Las pruebas en emulador y navegador no equivalen a confirmación en producción.
+
+
+## Cuenta discreta e instalación
+El usuario pide ocultar el panel permanente de Cerrar sesión/Revisar conexión: dejar indicador pequeño y controles en botón de cuenta del encabezado. El panel se muestra para iniciar sesión o atender errores. Se prepara instalación mediante manifest e iconos con inicio en app.html. La misma cuenta autorizada accede a los datos de Firebase desde distintos dispositivos; Drive se conecta por dispositivo. No modificar reglas de acceso para incorporar otras cuentas ni almacenar registros financieros en caché por instalarla.

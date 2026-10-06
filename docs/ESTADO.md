@@ -1,3 +1,9 @@
+## Confirmación del usuario en el proyecto real
+
+El usuario publicó las reglas, registró $100 ficticios, confirmó Firebase y copia en Drive (captura 19:02:16), cambió a $200 y comunicó que restaurar devolvió el saldo a $100. Después eliminó el ingreso ficticio: captura de Inicio con Efectivo/Virtual/total en $0 y nueva copia de Drive a las 19:05:21. El ciclo financiero real guardar → respaldar → recuperar → eliminar queda confirmado por el usuario. Sin comprobación directa de segundo dispositivo todavía.
+
+Nueva mejora solicitada: controles de cuenta en botón superior, indicador compacto de conexión e instalación desde Android. Manifest con iconos e inicio en app.html; sin caché de datos financieros ni cambio en la persistencia de autenticación. Instrucciones en docs/INSTALAR.md.
+
 ## Estado vigente: guardado privado del diseño aprobado
 
 Implementados `app.html`, validación monetaria y de vínculos, transacciones atómicas con revisión, categorías privadas, edición/eliminación, lectura de servidor y sincronización mediante listener. Respaldo completo con categorías y modo financial compatible con el Worker publicado, descarga JSON y restauración con copia previa y conflicto de revisión. La demostración sigue separada.
