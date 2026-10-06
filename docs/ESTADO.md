@@ -76,3 +76,10 @@ Fechas de Drive corregidas para usar explícitamente America/Argentina/Buenos_Ai
 - Pendientes en interfaz/modelo final: edición/eliminación, fijos privados, casos y cierres/reclasificaciones completos, recuperación del modelo financiero, reglas completas y sincronización multi-dispositivo.
 - Revisión Chromium local: cinco pestañas sin desbordamiento a 390 px; carga ficticia con centavos; hoy visible en Efectivo; Evolución vuelve con detalles cerrados; tema oscuro; presentación a 1100 px sin desbordamiento.
 - Esperar comentarios de diseño del usuario mientras se conserva la especificación vigente.
+
+## Corrección del pase entre meses en demo
+
+- Usuario reportó que no podía mover $4.000 ficticios de septiembre a octubre. Causa: fecha por defecto actual usada como mes de origen aunque estuviera consultando otro mes.
+- Formulario de pase usa Mes de origen explícito (mes consultado) y Mes de destino (actual si origen anterior); la fecha habitual de ingresos/gastos no cambia.
+- Lista distingue salida «Para …» y entrada «Desde …», guardadas en una sola operación vinculada.
+- Prueba Chromium: septiembre Efectivo $4.000 → $0; octubre Efectivo $7.150 → $11.150; Evolución conserva ingresos $15.000/$12.000 sin contar el pase.
