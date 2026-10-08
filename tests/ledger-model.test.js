@@ -57,3 +57,10 @@ test('only personal income accepts its explicit origin',()=>{
  delete data.operations[0].incomeCategory;data.operations[1].incomeCategory='mel';assert.throws(()=>validateLedger(data),/Detalle/);
  delete data.operations[1].incomeCategory;data.operations[2].incomeCategory='extra';assert.throws(()=>validateLedger(data),/Detalle/);
 });
+test('loans for card payments increase balance without inflating earnings or reducing personal expenses',async()=>{
+ const {monthlySummary}=await import('../ledger-model.js');const data=sample();const before=totals(data,'2026-10');
+ data.operations.push(op('card-loan','income',[leg('cash','2026-10-08',500000)],{incomeSource:'loan'}));validateLedger(data);
+ const summary=monthlySummary(data,'2026-10');assert.equal(summary.loans,500000);assert.equal(summary.balance,before.balance+500000);assert.equal(summary.income,before.income);assert.equal(summary.contributions,before.contributions);assert.equal(summary.netExpense,before.netExpense);
+ assert.deepEqual(await validateBackup(await makeBackup({revision:7,ledger:data})),data);
+ data.operations.at(-1).incomeCategory='extra';assert.throws(()=>validateLedger(data),/Detalle/);
+});

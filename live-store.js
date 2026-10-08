@@ -1,7 +1,7 @@
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 import * as sdk from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
-import {createLedgerRepository} from './ledger-repository.js?v=monthly-summary-1';
+import {createLedgerRepository} from './ledger-repository.js?v=card-payment-loans-1';
 const app=initializeApp({apiKey:'AIzaSyBB4GrQQeRwgQlJ_jFqMbJzRU4FOTaI1cw',authDomain:'control-de-gastos-72453.firebaseapp.com',projectId:'control-de-gastos-72453',appId:'1:585615744945:web:e720a412a6bbd7c6382790'});
 export function errorMessage(error){return ({'permission-denied':'Falta habilitar el guardado privado. Publicá las reglas de Firestore indicadas abajo con la cuenta autorizada.','unavailable':'No hay conexión con Firebase. No se confirmó el guardado. Conservá el formulario e intentá cuando vuelva Internet.','resource-exhausted':'Firebase alcanzó su cuota. No se confirmó el guardado; intentá más tarde.','auth/popup-blocked':'Permití la ventana de Google e intentá de nuevo.','auth/popup-closed-by-user':'No se completó el acceso con Google.','auth/network-request-failed':'No se pudo conectar con Google. Revisá Internet.'})[error.code]||error.message||'No se pudo completar la operación.';}
 export async function connectStore({onState,onStatus,onSignedOut}){

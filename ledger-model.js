@@ -23,7 +23,7 @@ export function validateLedger(input){
   const [a,b]=op.legs;
   if(linked){require(a.cents<0&&b.cents===-a.cents,'Las partes vinculadas deben tener el mismo importe.');if(op.kind==='transfer')require(a.location!==b.location&&a.date===b.date,'Transferencia incompleta.');else require(a.location===b.location&&a.date.slice(0,7)!==b.date.slice(0,7),'Pase entre meses inválido.');}
   else require(['expense','saving-out'].includes(op.kind)?a.cents<0:a.cents>0,'El signo del importe no corresponde al movimiento.');
-  if(op.kind==='income')require(['own','contribution'].includes(op.incomeSource),'Origen del ingreso inválido.');else require(op.incomeSource===undefined,'Solo los ingresos tienen origen.');
+  if(op.kind==='income')require(['own','contribution','loan'].includes(op.incomeSource),'Origen del ingreso inválido.');else require(op.incomeSource===undefined,'Solo los ingresos tienen origen.');
   if(op.incomeCategory!==undefined)require(op.kind==='income'&&op.incomeSource==='own'&&['salary','mel','misa','extra'].includes(op.incomeCategory),'Detalle del ingreso propio inválido.');
   if(op.kind==='expense')require(ids.has(op.categoryId),'El gasto necesita una categoría válida.');else require(op.categoryId===undefined,'Solo los gastos tienen categoría.');
  }
@@ -32,7 +32,7 @@ export function validateLedger(input){
 }
 const currencyFormatter=new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',minimumFractionDigits:2,maximumFractionDigits:2});
 export function formatMoney(cents){require(Number.isSafeInteger(cents),'Importe monetario inválido.');const absolute=BigInt(Math.abs(cents)),whole=absolute/100n;const signValue=cents<0?(whole===0n?-0:-whole):whole;return currencyFormatter.formatToParts(signValue).map(part=>part.type==='fraction'?String(absolute%100n).padStart(2,'0'):part.value).join('');}
-export function totals(ledger,month,location){let balance=0,income=0,contributions=0,expense=0,sent=0,returned=0;for(const op of ledger.operations)for(const leg of op.legs){if(leg.date.slice(0,7)!==month||(location&&leg.location!==location))continue;balance+=leg.cents;if(op.kind==='income'){if(op.incomeSource==='contribution')contributions+=leg.cents;else income+=leg.cents;}if(op.kind==='expense')expense-=leg.cents;if(op.kind==='saving-out')sent-=leg.cents;if(op.kind==='saving-in')returned+=leg.cents;}return {balance,income,contributions,expense,sent,returned,savings:sent-returned,netExpense:expense-contributions};}
+export function totals(ledger,month,location){let balance=0,income=0,contributions=0,expense=0,sent=0,returned=0;for(const op of ledger.operations)for(const leg of op.legs){if(leg.date.slice(0,7)!==month||(location&&leg.location!==location))continue;balance+=leg.cents;if(op.kind==='income'){if(op.incomeSource==='contribution')contributions+=leg.cents;else if(op.incomeSource==='own')income+=leg.cents;}if(op.kind==='expense')expense-=leg.cents;if(op.kind==='saving-out')sent-=leg.cents;if(op.kind==='saving-in')returned+=leg.cents;}return {balance,income,contributions,expense,sent,returned,savings:sent-returned,netExpense:expense-contributions};}
 export function ownIncomeCategory(op){
  if(['salary','mel','misa','extra'].includes(op.incomeCategory))return op.incomeCategory;
  const description=String(op.description||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -42,8 +42,8 @@ export function ownIncomeCategory(op){
  return 'extra';
 }
 export function monthlySummary(ledger,month){
- const result={...totals(ledger,month),salary:0,mel:0,misa:0,extra:0};
- for(const op of ledger.operations){if(op.kind!=='income'||op.incomeSource!=='own')continue;for(const leg of op.legs){if(leg.date.slice(0,7)===month)result[ownIncomeCategory(op)]+=leg.cents;}}
+ const result={...totals(ledger,month),salary:0,mel:0,misa:0,extra:0,loans:0};
+ for(const op of ledger.operations){if(op.kind!=='income')continue;for(const leg of op.legs){if(leg.date.slice(0,7)!==month)continue;if(op.incomeSource==='loan')result.loans+=leg.cents;else if(op.incomeSource==='own')result[ownIncomeCategory(op)]+=leg.cents;}}
  return result;
 }
 export async function checksum(data){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(data)));return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');}

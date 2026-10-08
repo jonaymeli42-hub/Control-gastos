@@ -1,4 +1,4 @@
-import {emptyLedger,validateLedger} from './ledger-model.js?v=monthly-summary-1';
+import {emptyLedger,validateLedger} from './ledger-model.js?v=card-payment-loans-1';
 export class Conflict extends Error {constructor(){super('Los datos cambiaron en otro dispositivo. Revisá la versión actual y volvé a editar.');this.code='ledger/conflict';}}
 // A whole ledger is one atomic document: no partial transfers or torn backups.
 export function createLedgerRepository(db,uid,sdk){
