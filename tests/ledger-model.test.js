@@ -64,3 +64,31 @@ test('loans for card payments count as payment contributions without inflating p
  assert.deepEqual(await validateBackup(await makeBackup({revision:7,ledger:data})),data);
  data.operations.at(-1).incomeCategory='extra';assert.throws(()=>validateLedger(data),/Detalle/);
 });
+
+test('temporary borrowed money changes balances only, repayment principal is not an expense',async()=>{
+ const {monthlySummary}=await import('../ledger-model.js');const data=sample(),before=monthlySummary(data,'2026-10');
+ data.operations.push(op('temporary-loan','income',[leg('cash','2026-10-09',100_000_000)],{incomeSource:'temporary'}));
+ let summary=monthlySummary(validateLedger(data),'2026-10');assert.equal(summary.balance,before.balance+100_000_000);
+ for(const key of ['income','salary','mel','misa','extra','contributions','expense','netExpense','savings'])assert.equal(summary[key],before[key]);
+ data.operations.push(op('repay-part','loan-repayment',[leg('virtual','2026-10-12',-25_000_000)]));
+ summary=monthlySummary(validateLedger(data),'2026-10');assert.equal(summary.balance,before.balance+75_000_000);assert.equal(summary.expense,before.expense);assert.equal(summary.netExpense,before.netExpense);
+ data.operations.push(op('repay-rest','loan-repayment',[leg('cash','2026-10-15',-75_000_000)]));
+ summary=monthlySummary(validateLedger(data),'2026-10');assert.deepEqual(summary,before);
+ assert.deepEqual(await validateBackup(await makeBackup({revision:8,ledger:data})),data);
+});
+test('reclassifying an extra as a temporary loan preserves balance and removes personal income',async()=>{
+ const {monthlySummary}=await import('../ledger-model.js');const data=emptyLedger();
+ data.operations.push(op('existing-extra','income',[leg('virtual','2026-10-09',100_000_000)],{incomeSource:'own',incomeCategory:'extra'}));
+ const before=monthlySummary(data,'2026-10');data.operations[0].incomeSource='temporary';delete data.operations[0].incomeCategory;
+ const after=monthlySummary(validateLedger(data),'2026-10');assert.equal(after.balance,before.balance);assert.equal(after.income,0);assert.equal(after.extra,0);assert.equal(after.contributions,0);assert.equal(after.netExpense,0);
+});
+test('repayment in a later month remains separate from spending, interest is a regular expense',()=>{
+ const data=emptyLedger();data.operations.push(op('received','income',[leg('cash','2026-10-09',100000)],{incomeSource:'temporary'}),op('returned','loan-repayment',[leg('cash','2026-11-01',-100000)]),op('interest','expense',[leg('cash','2026-11-01',-5000)],{categoryId:'uncategorized'}));
+ validateLedger(data);assert.equal(totals(data,'2026-10').income,0);assert.equal(totals(data,'2026-11').expense,5000);assert.equal(totals(data,'2026-11').balance,-105000);
+});
+test('temporary loans and repayment reject incompatible metadata and incorrect signs',()=>{
+ const data=emptyLedger();data.operations.push(op('return','loan-repayment',[leg('cash','2026-10-09',100000)]));assert.throws(()=>validateLedger(data),/signo/);
+ data.operations[0].legs[0].cents=-100000;data.operations[0].categoryId='food';assert.throws(()=>validateLedger(data),/Solo los gastos/);
+ delete data.operations[0].categoryId;data.operations[0].incomeSource='temporary';assert.throws(()=>validateLedger(data),/Solo los ingresos/);
+ data.operations=[op('receive','income',[leg('cash','2026-10-09',100000)],{incomeSource:'temporary',incomeCategory:'extra'})];assert.throws(()=>validateLedger(data),/Detalle/);
+});

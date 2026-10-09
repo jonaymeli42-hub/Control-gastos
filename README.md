@@ -20,3 +20,18 @@ Demostración separada: demo.html (GitHub Pages). Datos e importes ficticios y c
 `app.html` usa el mismo diseño, empieza sin movimientos ficticios y se conecta a la cuenta autorizada. `index.html` conserva las herramientas de configuración. Reglas: `firestore.rules`. Modelo validado: `ledger-model.js`; almacenamiento atómico y concurrencia: `ledger-repository.js`.
 
 Verificación local: `npm run test:model`, `npm run test:worker`, `npm run test:rules` (Java 21). Las pruebas de emulador no acreditan una escritura en el proyecto de producción.
+
+## Préstamos recibidos temporalmente
+
+En Efectivo o Virtual, elegí Otro ingreso → Préstamo recibido temporal.
+Aumenta el saldo disponible y queda en Movimientos, pero no suma a ingresos
+propios, aportes ajenos para pagos, gastos ni ahorro. Para devolver el capital,
+elegí Devolver préstamo recibido: reduce el saldo sin contar como gasto.
+Si hay intereses, se registran por separado como gasto con una categoría.
+
+Un Extra ya cargado se puede editar y reclasificar como préstamo temporal,
+conservando su importe, fecha e identificador. No se reclasifican registros
+existentes automáticamente. Los respaldos completos conservan estas operaciones.
+El modelo usa incomeSource=temporary para la recepción y kind=loan-repayment
+para devolver capital. No se mezclan con Préstamos para pagos de tarjetas,
+que mantiene la clasificación de aporte ajeno para pagos acordada anteriormente.

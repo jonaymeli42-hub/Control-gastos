@@ -16,14 +16,14 @@ export function validateLedger(input){
  for(const op of input.operations){
   keys(op,['id','kind','incomeSource','incomeCategory','categoryId','description','legs']);
   require(validId(op.id)&&!opIds.has(op.id),'Identificador de movimiento inválido o repetido.');opIds.add(op.id);
-  require(['income','expense','transfer','month','saving-out','saving-in'].includes(op.kind)&&typeof op.description==='string'&&op.description.length>0&&op.description.length<=100,'Tipo o descripción inválidos.');
+  require(['income','expense','transfer','month','saving-out','saving-in','loan-repayment'].includes(op.kind)&&typeof op.description==='string'&&op.description.length>0&&op.description.length<=100,'Tipo o descripción inválidos.');
   const linked=['transfer','month'].includes(op.kind);
   require(Array.isArray(op.legs)&&op.legs.length===(linked?2:1),'Las partes del movimiento están incompletas.');
   for(const leg of op.legs){keys(leg,['location','date','cents','description']);require(['cash','virtual'].includes(leg.location)&&validDate(leg.date)&&Number.isSafeInteger(leg.cents)&&leg.cents!==0&&Math.abs(leg.cents)<=1_000_000_000_000,'Fecha, ubicación o importe inválidos.');if(leg.description!==undefined)require(typeof leg.description==='string'&&leg.description.length<=180,'Descripción vinculada inválida.');absoluteTotal+=Math.abs(leg.cents);require(Number.isSafeInteger(absoluteTotal),'El total excede la precisión monetaria permitida.');}
   const [a,b]=op.legs;
   if(linked){require(a.cents<0&&b.cents===-a.cents,'Las partes vinculadas deben tener el mismo importe.');if(op.kind==='transfer')require(a.location!==b.location&&a.date===b.date,'Transferencia incompleta.');else require(a.location===b.location&&a.date.slice(0,7)!==b.date.slice(0,7),'Pase entre meses inválido.');}
-  else require(['expense','saving-out'].includes(op.kind)?a.cents<0:a.cents>0,'El signo del importe no corresponde al movimiento.');
-  if(op.kind==='income')require(['own','contribution','loan'].includes(op.incomeSource),'Origen del ingreso inválido.');else require(op.incomeSource===undefined,'Solo los ingresos tienen origen.');
+  else require(['expense','saving-out','loan-repayment'].includes(op.kind)?a.cents<0:a.cents>0,'El signo del importe no corresponde al movimiento.');
+  if(op.kind==='income')require(['own','contribution','loan','temporary'].includes(op.incomeSource),'Origen del ingreso inválido.');else require(op.incomeSource===undefined,'Solo los ingresos tienen origen.');
   if(op.incomeCategory!==undefined)require(op.kind==='income'&&((op.incomeSource==='own'&&['salary','mel','misa','extra'].includes(op.incomeCategory))||(op.incomeSource==='contribution'&&op.incomeCategory==='card-loan')),'Detalle del ingreso propio inválido.');
   if(op.kind==='expense')require(ids.has(op.categoryId),'El gasto necesita una categoría válida.');else require(op.categoryId===undefined,'Solo los gastos tienen categoría.');
  }
