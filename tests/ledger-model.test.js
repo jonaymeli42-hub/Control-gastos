@@ -92,3 +92,5 @@ test('temporary loans and repayment reject incompatible metadata and incorrect s
  delete data.operations[0].categoryId;data.operations[0].incomeSource='temporary';assert.throws(()=>validateLedger(data),/Solo los ingresos/);
  data.operations=[op('receive','income',[leg('cash','2026-10-09',100000)],{incomeSource:'temporary',incomeCategory:'extra'})];assert.throws(()=>validateLedger(data),/Detalle/);
 });
+
+test('unused fallback category may be removed, but expense references must remain valid',()=>{const data=emptyLedger();data.categories=data.categories.filter(c=>c.id!=='uncategorized');assert.doesNotThrow(()=>validateLedger(data));data.operations.push(op('test-expense','expense',[leg('cash','2026-10-13',-10000)],{categoryId:'uncategorized'}));assert.throws(()=>validateLedger(data));data.operations[0].categoryId='food';assert.doesNotThrow(()=>validateLedger(data));});

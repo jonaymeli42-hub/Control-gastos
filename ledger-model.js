@@ -11,7 +11,6 @@ export function validateLedger(input){
  require(Array.isArray(input.operations)&&input.operations.length<=4000&&Array.isArray(input.categories)&&input.categories.length>0&&input.categories.length<=100,'La cantidad de registros o categorías excede el límite.');
  const ids=new Set(),names=new Set();
  for(const c of input.categories){keys(c,['id','name']);require(validId(c.id)&&!ids.has(c.id)&&typeof c.name==='string'&&c.name===c.name.trim()&&c.name.length>0&&c.name.length<=40,'Categoría inválida o repetida.');const name=c.name.toLocaleLowerCase('es');require(!names.has(name),'Los nombres de las categorías deben ser diferentes.');ids.add(c.id);names.add(name);}
- require(input.categories.some(c=>c.id==='uncategorized'&&c.name==='Sin categoría'),'Falta la categoría Sin categoría.');
  const opIds=new Set();let absoluteTotal=0;
  for(const op of input.operations){
   keys(op,['id','kind','incomeSource','incomeCategory','categoryId','description','legs']);
