@@ -97,6 +97,17 @@
     else if(/^-?\d{1,3}(\.\d{3})+$/.test(text))text=text.replace(/\./g,'');
     const number=Number(text);return Number.isFinite(number)?Math.round(number*(thousands?1000:1)*100):null;
   }
+  function normalizeAmounts(month){
+    const money=new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',minimumFractionDigits:2,maximumFractionDigits:2});
+    const format=value=>{const cents=amountCents(value);return String(value??'').trim()!==''&&cents!==null?money.format(cents/100):value;};
+    for(const group of ['receivables','debts','cards'])for(const item of month[group])for(const f of item.fields){
+      const label=f.label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+      if(/^(notas?|fecha|vence|vencimiento|cierra|cierre|cantidad|numero|plazo|meses)\b/.test(label))continue;
+      if(group==='cards'&&!/^(total|mio|ajeno|mes anterior|importe|monto)\b/.test(label))continue;
+      if(amountInLabel(f))f.label=format(f.label);else f.value=format(f.value);
+    }
+    return month;
+  }
   const amountOwner=(item,field)=>['Mío','Ajeno'].includes(field.owner)?field.owner:/pr[eé]stamos?\s+(?:ezequiel|exe|eze)\b/i.test(item.label)?'Ajeno':'Mío';
   function ownTotal(month){
     if(!month)return {amount:0,unreadable:0};
@@ -123,7 +134,7 @@
   function validBook(b) {
     return b && b.version===1 && b.months && typeof b.months==='object' && !Array.isArray(b.months) && Object.keys(b.months).length<=500 && Object.entries(b.months).every(([key,m])=>/^\d{4}-(0[1-9]|1[0-2])$/.test(key)&&validMonth(m));
   }
-  globalThis.PaymentAgendaModel = {sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
+  globalThis.PaymentAgendaModel = {normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
 })();
 
 export default globalThis.PaymentAgendaModel;

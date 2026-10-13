@@ -1,4 +1,4 @@
-import AgendaModel from './agenda-model.js?v=agenda-transfer-1';
+import AgendaModel from './agenda-model.js?v=pesos-1';
 // Money is stored as integer centavos. This module contains no personal data.
 export const DEFAULT_CATEGORIES = [{id:'food',name:'Comida'},{id:'outings',name:'Salidas'},{id:'fuel',name:'Combustible'},{id:'transport',name:'Transporte'},{id:'card',name:'Tarjeta'},{id:'uncategorized',name:'Sin categoría'}];
 export const emptyLedger = () => ({operations:[],categories:structuredClone(DEFAULT_CATEGORIES)});
