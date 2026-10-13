@@ -1,3 +1,4 @@
+import AgendaModel from './agenda-model.js?v=agenda-transfer-1';
 // Money is stored as integer centavos. This module contains no personal data.
 export const DEFAULT_CATEGORIES = [{id:'food',name:'Comida'},{id:'outings',name:'Salidas'},{id:'fuel',name:'Combustible'},{id:'transport',name:'Transporte'},{id:'card',name:'Tarjeta'},{id:'uncategorized',name:'Sin categoría'}];
 export const emptyLedger = () => ({operations:[],categories:structuredClone(DEFAULT_CATEGORIES)});
@@ -46,9 +47,9 @@ export function monthlySummary(ledger,month){
  return result;
 }
 export async function checksum(data){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(data)));return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');}
-export async function makeBackup(state){const ledger=validateLedger(state.ledger);const data={operations:ledger.operations,categories:ledger.categories,cases:[],templates:[]};return {format:'control-gastos-backup',schemaVersion:1,mode:'financial',complete:true,source:'firestore',revision:state.revision,snapshotId:crypto.randomUUID(),createdAt:new Date().toISOString(),timeZone:'America/Argentina/Buenos_Aires',data,checksum:await checksum(data)};}
+export async function makeBackup(state){const ledger=validateLedger(state.ledger);const data={operations:ledger.operations,categories:ledger.categories,cases:[],templates:[]};if(state.paymentAgenda!==undefined){require(AgendaModel.validBook(state.paymentAgenda),'La agenda del respaldo no es válida.');data.paymentAgenda=structuredClone(state.paymentAgenda);}return {format:'control-gastos-backup',schemaVersion:1,mode:'financial',complete:true,source:'firestore',revision:state.revision,snapshotId:crypto.randomUUID(),createdAt:new Date().toISOString(),timeZone:'America/Argentina/Buenos_Aires',data,checksum:await checksum(data)};}
 export async function validateBackup(backup){
  require(plain(backup)&&backup.format==='control-gastos-backup'&&backup.schemaVersion===1&&backup.mode==='financial'&&backup.complete===true&&backup.source==='firestore'&&backup.timeZone==='America/Argentina/Buenos_Aires'&&Number.isSafeInteger(backup.revision)&&backup.revision>=0&&validId(backup.snapshotId)&&typeof backup.createdAt==='string'&&Number.isFinite(Date.parse(backup.createdAt)),'Esta copia no corresponde a movimientos de Gastos. Las copias de la prueba ficticia no se importan aquí.');
- keys(backup.data,['operations','categories','cases','templates']);require(Array.isArray(backup.data.cases)&&backup.data.cases.length===0&&Array.isArray(backup.data.templates)&&backup.data.templates.length===0,'El formato de la copia no es compatible.');
+ keys(backup.data,['operations','categories','cases','templates','paymentAgenda']);require(backup.data.paymentAgenda===undefined||AgendaModel.validBook(backup.data.paymentAgenda),'La agenda del respaldo no es válida.');require(Array.isArray(backup.data.cases)&&backup.data.cases.length===0&&Array.isArray(backup.data.templates)&&backup.data.templates.length===0,'El formato de la copia no es compatible.');
  require(backup.checksum===await checksum(backup.data),'La integridad de la copia no coincide. No se restauró.');return validateLedger({operations:backup.data.operations,categories:backup.data.categories});
 }

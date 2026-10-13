@@ -35,3 +35,16 @@ existentes automáticamente. Los respaldos completos conservan estas operaciones
 El modelo usa incomeSource=temporary para la recepción y kind=loan-repayment
 para devolver capital. No se mezclan con Préstamos para pagos de tarjetas,
 que mantiene la clasificación de aporte ajeno para pagos acordada anteriormente.
+
+## Agenda de pagos
+
+La aplicación live (`app.html` e `instalar.html`) incluye la agenda mensual de
+Control Tarjetas. Mantiene la clave local `control-tarjetas-agenda-v1` para leer
+las planillas existentes en el mismo origen/navegador sin copiarlas ni borrarlas.
+La agenda sigue siendo local y no pasa a Firestore. El acceso visible queda
+solo en Gastos. Las nuevas copias financieras incluyen opcionalmente
+`data.paymentAgenda`, validada y cubierta por el checksum; las anteriores
+siguen siendo compatibles. Restaurar una copia nueva restaura también la
+agenda local, después de la confirmación y de conservar una copia previa.
+
+Validación adicional: `node --test tests/agenda-backup.test.js`.
