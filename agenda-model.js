@@ -19,7 +19,7 @@
     const isPayment=f=>!/^(notas?|cuotas?|vence|vencimiento|fecha|cierra|cierre|mes anterior|ajeno)\b/.test(name(f.label));
     for(const item of month.debts){
       const loan=/prestamos?/.test(name(item.label));
-      const fields=item.fields.filter(f=>(isPayment(f)||(loan&&/^(cuotas?|ajeno)\b/.test(name(f.label))&&String(f.value).trim()!==''&&amountCents(f.value)!==null))&&(loan||amountOwner(item,f)==='Mío'));
+      const fields=item.fields.filter(f=>fieldType(f)==='money'&&(f.kind==='money'||isPayment(f)||(loan&&/^(cuotas?|ajeno)\b/.test(name(f.label))&&String(f.value).trim()!==''&&amountCents(f.value)!==null))&&(loan||amountOwner(item,f)==='Mío'));
       if(!fields.length)continue;
       const split=/movistar/i.test(item.label)||['hogar','celular'].every(label=>item.fields.some(f=>name(f.label)===label));
       if(split){
@@ -33,7 +33,7 @@
     }
     for(const item of month.cards){
       const due=item.fields.find(f=>/^(vence|vencimiento|fecha de vencimiento)$/.test(name(f.label)))?.value.trim()||'';
-      const total=item.fields.find(f=>name(f.label)==='total')||item.fields.find(f=>name(f.label)==='mio');
+      const total=item.fields.find(f=>fieldType(f)==='money'&&name(f.label)==='total')||item.fields.find(f=>fieldType(f)==='money'&&name(f.label)==='mio');
       add('cards:'+item.id,item.label,item.dueDate||due,item.paid,total?amountCents(total.value):0);
     }
     const byKey=new Map(entries.map(item=>[item.sourceKey,item]));
@@ -86,7 +86,7 @@
     }
     return syncOrder(result);
   }
-  const amountInLabel=f=>f.amountSide==='label'||/^\s*\$?\s*\d[\d.,\s]*$/.test(f.label)||f.label.trim()===''||f.label==='Nuevo campo';
+  const amountInLabel=f=>f.kind!=='text'&&(f.amountSide==='label'||/^\s*\$?\s*\d[\d.,\s]*$/.test(f.label)||f.label.trim()===''||f.label==='Nuevo campo');
   function amountCents(value){
     let text=String(value??'').trim().toLowerCase().replace(/^(?:ars|\$)\s*/,'').replace(/\s/g,'');
     if(!text)return 0;
@@ -97,13 +97,15 @@
     else if(/^-?\d{1,3}(\.\d{3})+$/.test(text))text=text.replace(/\./g,'');
     const number=Number(text);return Number.isFinite(number)?Math.round(number*(thousands?1000:1)*100):null;
   }
+  const fieldType=f=>f.kind||(/^(notas?|fecha|vence|vencimiento|cierra|cierre|cantidad|numero|plazo|meses|cuota)$/i.test(f.label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim())?'text':'money');
   function normalizeAmounts(month){
     const money=new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',minimumFractionDigits:2,maximumFractionDigits:2});
     const format=value=>{const cents=amountCents(value);return String(value??'').trim()!==''&&cents!==null?money.format(cents/100):value;};
     for(const group of ['receivables','debts','cards'])for(const item of month[group])for(const f of item.fields){
+      if(fieldType(f)==='text'){if(f.kind===undefined&&/^cuota$/i.test(f.label.trim())&&/^\s*(?:\$|ARS)/i.test(f.value)){const cents=amountCents(f.value);if(cents!==null)f.value=String(cents/100);}continue;}
       const label=f.label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
-      if(/^(notas?|fecha|vence|vencimiento|cierra|cierre|cantidad|numero|plazo|meses)\b/.test(label))continue;
-      if(group==='cards'&&!/^(total|mio|ajeno|mes anterior|importe|monto)\b/.test(label))continue;
+      if(f.kind===undefined&&/^(notas?|fecha|vence|vencimiento|cierra|cierre|cantidad|numero|plazo|meses)\b/.test(label))continue;
+      if(group==='cards'&&f.kind!=='money'&&!/^(total|mio|ajeno|mes anterior|importe|monto)\b/.test(label))continue;
       if(amountInLabel(f))f.label=format(f.label);else f.value=format(f.value);
     }
     return month;
@@ -116,12 +118,13 @@
     const include=value=>{const parsed=amountCents(value);if(parsed===null)unreadable++;else cents+=parsed;};
     for(const item of month.debts){
       for(const f of item.fields){
+        if(fieldType(f)==='text')continue;
         if(f.label==='Nuevo campo'&&!f.value.trim())continue;
-        if(/^(?:notas?|cuotas?|vence|vencimiento|fecha|cierra|cierre|mes anterior|ajeno)\b/.test(name(f.label)))continue;
+        if(f.kind!=='money'&&/^(?:notas?|cuotas?|vence|vencimiento|fecha|cierra|cierre|mes anterior|ajeno)\b/.test(name(f.label)))continue;
         if(amountOwner(item,f)==='Mío')include(amountInLabel(f)?f.label:f.value);
       }
     }
-    for(const item of month.cards){const field=item.fields.find(f=>name(f.label)==='mio');if(field)include(field.value);}
+    for(const item of month.cards){const field=item.fields.find(f=>name(f.label)==='mio');if(field&&fieldType(field)==='money')include(field.value);}
     return {amount:cents/100,unreadable};
   }
   const validDate=x=>{if(x==='')return true;if(typeof x!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(x))return false;const d=new Date(x+'T12:00:00Z');return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===x;};
@@ -129,12 +132,12 @@
   function validMonth(m) {
     if (!m || !['order','receivables','debts','cards'].every(k=>Array.isArray(m[k]) && m[k].length<=200)) return false;
     const ids=new Set();const unique=id=>{if(typeof id!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(id)||ids.has(id))return false;ids.add(id);return true;};
-    return m.order.every(x=>x&&unique(x.id)&&text(x.label)&&typeof x.paid==='boolean'&&(x.dueDate===undefined||validDate(x.dueDate))&&(x.sourceKey===undefined||text(x.sourceKey))&&(x.orderDate===undefined||text(x.orderDate))&&(x.orderAmountCents===undefined||x.orderAmountCents===null||Number.isSafeInteger(x.orderAmountCents))) && ['receivables','debts','cards'].every(k=>m[k].every(x=>x&&unique(x.id)&&text(x.label)&&['dueDate','homeDueDate','cellDueDate'].every(property=>x[property]===undefined||validDate(x[property]))&&(x.paid===undefined||typeof x.paid==='boolean')&&Array.isArray(x.fields)&&x.fields.length<=50&&x.fields.every(f=>f&&unique(f.id)&&text(f.label)&&text(f.value)&&(f.detail===undefined||text(f.detail))&&(f.owner===undefined||['Mío','Ajeno'].includes(f.owner))&&(f.dueDate===undefined||validDate(f.dueDate))&&(f.paid===undefined||typeof f.paid==='boolean')&&(f.amountSide===undefined||f.amountSide==='label'))));
+    return m.order.every(x=>x&&unique(x.id)&&text(x.label)&&typeof x.paid==='boolean'&&(x.dueDate===undefined||validDate(x.dueDate))&&(x.sourceKey===undefined||text(x.sourceKey))&&(x.orderDate===undefined||text(x.orderDate))&&(x.orderAmountCents===undefined||x.orderAmountCents===null||Number.isSafeInteger(x.orderAmountCents))) && ['receivables','debts','cards'].every(k=>m[k].every(x=>x&&unique(x.id)&&text(x.label)&&['dueDate','homeDueDate','cellDueDate'].every(property=>x[property]===undefined||validDate(x[property]))&&(x.paid===undefined||typeof x.paid==='boolean')&&Array.isArray(x.fields)&&x.fields.length<=50&&x.fields.every(f=>f&&unique(f.id)&&text(f.label)&&text(f.value)&&(f.kind===undefined||['money','text'].includes(f.kind))&&(f.detail===undefined||text(f.detail))&&(f.owner===undefined||['Mío','Ajeno'].includes(f.owner))&&(f.dueDate===undefined||validDate(f.dueDate))&&(f.paid===undefined||typeof f.paid==='boolean')&&(f.amountSide===undefined||f.amountSide==='label'))));
   }
   function validBook(b) {
     return b && b.version===1 && b.months && typeof b.months==='object' && !Array.isArray(b.months) && Object.keys(b.months).length<=500 && Object.entries(b.months).every(([key,m])=>/^\d{4}-(0[1-9]|1[0-2])$/.test(key)&&validMonth(m));
   }
-  globalThis.PaymentAgendaModel = {normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
+  globalThis.PaymentAgendaModel = {fieldType,normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
 })();
 
 export default globalThis.PaymentAgendaModel;
