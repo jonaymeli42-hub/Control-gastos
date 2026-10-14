@@ -58,3 +58,9 @@ nav{width:calc(100% - 24px);max-width:696px;bottom:max(12px,env(safe-area-inset-
 .app-guide{margin:16px 0;padding:16px;border:1px solid currentColor;border-radius:16px}.app-guide summary{cursor:pointer;font-weight:700;min-height:32px}.app-guide-text{line-height:1.6}.app-guide-text h3,.app-guide-text h4{margin-top:24px}.app-guide-text p{margin:12px 0}
 
 .summary-detail{cursor:pointer}.summary-detail:focus-visible{outline:3px solid var(--accent);outline-offset:3px}.summary-detail-hint{display:block;color:var(--accent);font-size:12px;font-weight:600;margin-top:12px;text-align:right}
+
+/* Make date boundaries distinct from individual movement separators. */
+.movement-days .day{border-bottom:3px solid #98a9b9}
+body.dark .movement-days .day,[data-theme="dark"] .movement-days .day{border-bottom-color:#849bad}
+.movement-days .day:last-child{border-bottom:0}
+.movement-location{display:inline-block;font-weight:750;color:var(--text);background:rgba(128,160,184,.16);border-radius:5px;padding:2px 6px;margin:2px 0}
