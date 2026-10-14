@@ -6,8 +6,8 @@
   "start_url": "./instalar.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f3f6fb",
-  "theme_color": "#172d4d",
+  "background_color": "#111a22",
+  "theme_color": "#111a22",
   "icons": [
     {
       "src": "icons/icon-192.png",
