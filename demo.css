@@ -64,3 +64,10 @@ nav{width:calc(100% - 24px);max-width:696px;bottom:max(12px,env(safe-area-inset-
 body.dark .movement-days .day,[data-theme="dark"] .movement-days .day{border-bottom-color:#849bad}
 .movement-days .day:last-child{border-bottom:0}
 .movement-location{display:inline-block;font-weight:750;color:var(--text);background:rgba(128,160,184,.16);border-radius:5px;padding:2px 6px;margin:2px 0}
+
+/* Monthly evolution uses the same three personal totals as Home. */
+.evolution-metrics{grid-template-columns:1fr;gap:10px}
+.evolution-metrics>div{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.evolution-metrics small{margin:0;font-size:12px}
+.evolution-metrics strong{white-space:nowrap;overflow-wrap:normal;flex-shrink:0;font-size:clamp(16px,4.5vw,20px)}
+@media(min-width:650px){.evolution-metrics{grid-template-columns:repeat(3,minmax(0,1fr))}.evolution-metrics>div{display:block}.evolution-metrics small{margin-bottom:6px}.evolution-metrics strong{font-size:18px}}
