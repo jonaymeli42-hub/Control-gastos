@@ -23,3 +23,5 @@ Las pruebas web de intercambio están en ../tests/native-note-bridge.test.js. `b
 La versión 1.2 busca el manejador WebAPK instalado que corresponda al enlace de cada aplicación. Si no está disponible, usa el manejador HTTPS elegido en Android, sin forzar Chrome. Un acceso directo sin instalación WebAPK puede seguir abriéndose en el navegador.
 
 La versión 1.3 avisa con vibración cuando el servicio está listo para escuchar, aporta vocabulario de gastos en Android 13+ y solicita más tolerancia a pausas. El servicio de voz puede ignorar estas sugerencias; la precisión debe verificarse con audio real, nunca se garantiza ni se corrigen importes mediante suposiciones.
+
+La versión 1.4 conserva la captura de resultados después de soltar el micrófono y bloquea el cambio de pestaña durante el resultado final. Terminar queda pendiente de esa respuesta para evitar guardar una transcripción parcial. Esto no acelera el servicio de voz.
