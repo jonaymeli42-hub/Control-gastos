@@ -5,7 +5,8 @@
   "scripts": {
     "test:rules": "firebase emulators:exec --only firestore --project demo-control-gastos \"node --test tests/firestore.rules.test.js\"",
     "test:model": "node --test tests/ledger-model.test.js tests/backup-format.test.js",
-    "test:worker": "node --test tests/worker.test.js"
+    "test:worker": "node --test tests/worker.test.js",
+    "test:voice": "node --test tests/voice-expense.test.js"
   },
   "dependencies": {
     "firebase": "12.19.0"
