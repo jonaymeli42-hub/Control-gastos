@@ -24,10 +24,10 @@
   ],
   "shortcuts": [
     {
-      "name": "Gasto por audio",
-      "short_name": "Audio",
-      "description": "Dictar un gasto y revisarlo antes de guardar",
-      "url": "./instalar.html?accion=audio",
+      "name": "Anotar gasto rápido",
+      "short_name": "Anotar gasto",
+      "description": "Dictar una nota para revisar después",
+      "url": "./instalar.html?accion=nota",
       "icons": [
         {
           "src": "icons/icon-192.png",
@@ -35,6 +35,12 @@
           "type": "image/png"
         }
       ]
+    },
+    {
+      "name": "Gastos pendientes",
+      "short_name": "Pendientes",
+      "description": "Revisar notas de gastos guardadas",
+      "url": "./instalar.html?accion=pendientes"
     }
   ]
 }
