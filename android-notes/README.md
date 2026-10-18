@@ -1,5 +1,7 @@
 # Anotar gasto para Android
 
+Abre sin grabar. Mantené apretado el micrófono para dictar y soltalo para terminar. Después de conceder permiso por primera vez, volvé a mantenerlo apretado.
+
 Anotador nativo para guardar rápidamente una nota dictada o escrita, con fecha y hora, y revisarla después en Control Gastos o Control Tarjetas. No registra movimientos automáticamente.
 
 Las notas quedan en el almacenamiento privado del teléfono. Al elegir una aplicación se envía la nota mediante el fragmento de su enlace HTTPS. Después de confirmar el gasto, el botón «Volver a Anotar gasto» confirma el registro y quita la nota de pendientes. Abrir o cancelar un formulario no la completa. El menú permite exportar las notas a un archivo JSON.

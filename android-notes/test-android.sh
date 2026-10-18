@@ -18,7 +18,7 @@ with zipfile.ZipFile('build/android-tests/resources.apk') as src,zipfile.ZipFile
 PY
 "$BT/zipalign" -f 4 build/android-tests/unsigned.apk build/android-tests/aligned.apk
 "$BT/apksigner" sign --ks "$SIGN_KEY" --ks-key-alias anotar --ks-pass "file:$SIGN_PASS" --out build/android-tests/tests.apk build/android-tests/aligned.apk
-"$SDK_ROOT/platform-tools/adb" install --no-incremental -r downloads/anotar-gasto-1.0.apk
+"$SDK_ROOT/platform-tools/adb" install --no-incremental -r downloads/anotar-gasto-1.1.apk
 "$SDK_ROOT/platform-tools/adb" shell pm grant com.controlfinanzas.anotargasto android.permission.RECORD_AUDIO
 "$SDK_ROOT/platform-tools/adb" install --no-incremental -r -t build/android-tests/tests.apk
 "$SDK_ROOT/platform-tools/adb" shell am instrument -w com.controlfinanzas.anotargasto.tests/.NativeTests
