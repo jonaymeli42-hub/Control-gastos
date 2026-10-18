@@ -9,7 +9,7 @@ export function initVoiceExpense({getCategories=()=>[],getToday=()=>new Date(Dat
  const dialog=document.createElement('dialog');dialog.id='voice-expense';dialog.setAttribute('aria-labelledby','voice-title');
  dialog.innerHTML=`<div class="dialog-title"><h2 id="voice-title">Anotar para después</h2><button type="button" id="voice-close" aria-label="Cerrar">×</button></div><p class="muted">Decí algo corto: «6.700 en el kiosco».</p><button type="button" id="voice-record" class="primary">🎙 Dictar nota</button><p id="voice-status" role="status" aria-live="polite"></p><label for="voice-text">Tu nota</label><textarea id="voice-text" rows="3" maxlength="1000" placeholder="6.700 en el kiosco"></textarea><button type="button" id="voice-save" class="primary">Listo</button><button type="button" id="voice-inbox" class="action">Ver pendientes</button><p class="muted">Se guarda sola al dictar. No cambia tus saldos. Después completás el gasto desde Pendientes.</p>`;
  const inbox=document.createElement('dialog');inbox.id='pending-expenses';inbox.setAttribute('aria-labelledby','pending-title');
- inbox.innerHTML=`<div class="dialog-title"><h2 id="pending-title">Gastos pendientes</h2><button type="button" id="pending-close" aria-label="Cerrar">×</button></div><p class="muted">La misma lista para Control Gastos y Control Tarjetas, en este teléfono. Elegí dónde registrar cada nota cuando tengas tiempo.</p><p id="pending-status" role="status"></p><div id="pending-list"></div><button type="button" id="pending-add" class="primary">🎙 Anotar otro</button>`;
+ inbox.innerHTML=`<div class="dialog-title"><h2 id="pending-title">Gastos pendientes</h2><button type="button" id="pending-close" aria-label="Cerrar">×</button></div><p class="muted">La misma lista para Control Gastos y Control Tarjetas, en este teléfono. Elegí dónde registrar cada nota cuando tengas tiempo.</p><p id="pending-status" role="status"></p><div id="pending-list"></div>`;
  document.body.append(dialog,inbox);
  const find=id=>dialog.querySelector('#'+id),record=find('voice-record'),status=find('voice-status'),text=find('voice-text');
  let recognition=null,timer=null,typingTimer=null,listening=false,generation=0,note=null,heard=false,savedText='',closeRequested=false,afterClose=null;
@@ -51,7 +51,7 @@ export function initVoiceExpense({getCategories=()=>[],getToday=()=>new Date(Dat
   try{const notes=store.read().notes.slice().reverse();inbox.querySelector('#pending-list').innerHTML=notes.length?notes.map(n=>`<article class="pending-note"><p>${escape(n.text)}</p><small>${escape(new Date(n.createdAt).toLocaleString('es-AR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}))}</small><div class="pending-note-actions"><button type="button" class="primary" data-review-note="${escape(n.id)}">Revisar y registrar</button><button type="button" class="action" data-discard-note="${escape(n.id)}">Descartar</button></div><div class="pending-targets" hidden><p>¿Dónde querés registrar esta nota?</p><button type="button" class="action" data-target-note="${escape(n.id)}" data-target="gastos">Control Gastos · gasto diario</button><button type="button" class="action" data-target-note="${escape(n.id)}" data-target="card-one">Control Tarjetas · un pago</button><button type="button" class="action" data-target-note="${escape(n.id)}" data-target="card-quota">Control Tarjetas · cuotas</button></div></article>`).join(''):'<p class="empty">No tenés gastos pendientes.</p>';}catch{inbox.querySelector('#pending-status').textContent='No pude leer las notas pendientes. No se modificó ningún dato.';}
   if(!inbox.open)inbox.showModal();
  }
- find('voice-inbox').onclick=()=>closeSafely(showInbox);inbox.querySelector('#pending-close').onclick=()=>inbox.close();inbox.querySelector('#pending-add').onclick=()=>{inbox.close();open(true);};
+ find('voice-inbox').onclick=()=>closeSafely(showInbox);inbox.querySelector('#pending-close').onclick=()=>inbox.close();
  function reviewNote(id){
   const n=store.read().notes.find(n=>n.id===id);if(!n)return false;
   const draft=parseVoiceExpense(n.text,getCategories(),n.date);inbox.close();
@@ -70,10 +70,10 @@ export function initVoiceExpense({getCategories=()=>[],getToday=()=>new Date(Dat
    location.href=url.href;
   }catch{inbox.querySelector('#pending-status').textContent='No pude abrir esta nota. Sigue guardada para revisar después.';}
  });
- document.addEventListener('click',event=>{if(event.target.closest('[data-voice-expense]'))open(true);else if(event.target.closest('[data-pending-expenses]'))showInbox();});
+ document.addEventListener('click',event=>{if(event.target.closest('[data-pending-expenses]'))showInbox();});
  document.addEventListener('visibilitychange',()=>{if(document.hidden&&dialog.open){saveNote();if(listening)stop();}});
  window.addEventListener('storage',event=>{if(event.key===key){refresh();if(inbox.open)showInbox();}});
  refresh();
- const action=new URLSearchParams(location.search).get('accion');if(action==='audio'||action==='nota'||action==='pendientes'){if(action==='pendientes')showInbox();else open(false);const url=new URL(location.href);url.searchParams.delete('accion');history.replaceState(null,'',url);}
+ const action=new URLSearchParams(location.search).get('accion');if(action==='audio'||action==='nota'||action==='pendientes'){showInbox();const url=new URL(location.href);url.searchParams.delete('accion');history.replaceState(null,'',url);}
  return {count,refresh,review:reviewNote,complete(id){const note=store.read().notes.find(n=>n.id===id);store.remove(id);changed();if(currentApp==='gastos')showNativeReturn(note,'gastos');},exportData:()=>store.read(),restoreData(book){store.restore(book);changed();if(inbox.open)showInbox();}};
 }
