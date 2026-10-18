@@ -27,6 +27,6 @@ with zipfile.ZipFile('build/resources.apk') as src,zipfile.ZipFile('build/unsign
  for p in Path('build/dex').glob('*.dex'):dst.write(p,p.name)
 PY
 "$BUILD_TOOLS/zipalign" -f -p 4 build/unsigned.apk build/aligned.apk
-"$BUILD_TOOLS/apksigner" sign --ks "$SIGN_KEY" --ks-key-alias anotar --ks-pass "file:$SIGN_PASS" --out downloads/anotar-gasto-1.1.apk build/aligned.apk
-"$BUILD_TOOLS/apksigner" verify --verbose downloads/anotar-gasto-1.1.apk
-sha256sum downloads/anotar-gasto-1.1.apk > downloads/anotar-gasto-1.1.apk.sha256
+"$BUILD_TOOLS/apksigner" sign --ks "$SIGN_KEY" --ks-key-alias anotar --ks-pass "file:$SIGN_PASS" --out downloads/anotar-gasto-1.2.apk build/aligned.apk
+"$BUILD_TOOLS/apksigner" verify --verbose downloads/anotar-gasto-1.2.apk
+sha256sum downloads/anotar-gasto-1.2.apk > downloads/anotar-gasto-1.2.apk.sha256
