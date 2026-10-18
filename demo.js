@@ -1,8 +1,10 @@
-import {pendingOperationId} from './pending-expenses.js?v=1';
-import {initVoiceExpense} from './voice-expense.js?v=shared-3';
+import {consumeNativeNote} from './native-note-bridge.js?v=1';
+import {pendingOperationId,createPendingExpenseStore,SHARED_PENDING_KEY} from './pending-expenses.js?v=native-1';
+import {initVoiceExpense} from './voice-expense.js?v=native-1';
 import {orderedMovementItems} from './movement-order.js?v=movement-order-1';
-import {emptyLedger,validateLedger,makeBackup,validateBackup,formatMoney,monthlySummary,ownIncomeCategory} from './ledger-model.js?v=pending-notes-1';
+import {emptyLedger,validateLedger,makeBackup,validateBackup,formatMoney,monthlySummary,ownIncomeCategory} from './ledger-model.js?v=native-1';
 const live=document.body.dataset.appMode==='live';
+let nativeNoteError='';try{consumeNativeNote(createPendingExpenseStore(localStorage,live?SHARED_PENDING_KEY:'control-gastos-demo-pending-expenses-v1'),window.location,window.history);}catch{nativeNoteError='No pude importar la nota del anotador. Sigue guardada en la app Android.';}
 let liveStore=null, liveRevision=0, liveReady=false, liveLoaded=false, writeBusy=false, pendingState=null, formRevision=0, draftId=null;
 const screen = document.getElementById('screen');
 const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Argentina/Buenos_Aires',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
@@ -105,6 +107,7 @@ voiceInbox=initVoiceExpense({getCategories:()=>categories,getToday:()=>new Date(
  document.getElementById('form-error').textContent=draft.warnings.join(' ');
  return true;
 }});
+if(nativeNoteError)toast(nativeNoteError);
 if(!live)openLinkedNote();
 
 function applyState(state){const openDetails=[...screen.querySelectorAll('details[open]')].map(el=>({category:el.dataset.categoryId,month:el.dataset.evolutionMonth}));const categoryDraft=document.getElementById('category-name')?.value;liveRevision=state.revision;operations.splice(0,operations.length,...state.ledger.operations);categories.splice(0,categories.length,...state.ledger.categories);render();if(categoryDraft&&document.getElementById('category-name'))document.getElementById('category-name').value=categoryDraft;for(const item of openDetails){const el=item.category?screen.querySelector('[data-category-id="'+item.category+'"]'):item.month?screen.querySelector('[data-evolution-month="'+item.month+'"]'):null;if(el)el.open=true;}openLinkedNote();}
@@ -119,7 +122,7 @@ if(live){
  window.DriveBackup.init({app:'gastos',getBackup:liveSnapshot,restoreEvent:'gastos:restore-ledger',restoreLabel:'Restaurar movimientos',returnTo:'app.html'});
  window.addEventListener('gastos:restore-ledger',event=>restoreLedger(event.detail));
  document.addEventListener('change',async event=>{if(event.target.id!=='import-ledger')return;const file=event.target.files?.[0];if(!file)return;try{if(file.size>2_000_000)throw new Error('El archivo es demasiado grande.');await restoreLedger(JSON.parse(await file.text()));}catch(error){toast(liveError(error));}finally{event.target.value='';}});
- try{const module=await import('./live-store.js?v=pending-notes-1');liveError=module.errorMessage;liveStore=await module.connectStore({onState:state=>{if(state.revision<liveRevision)return;if(writeBusy)pendingState=state;else{liveReady=true;liveLoaded=true;applyState(state);if(state.revision>0)window.DriveBackup.changed();}},onSignedOut:()=>{liveReady=false;liveLoaded=false;liveRevision=0;pendingState=null;operations.splice(0);categories.splice(0,categories.length,...emptyLedger().categories);if(dialog.open)dialog.close();render();},onStatus:(message,ready,rules)=>{liveReady=ready&&navigator.onLine;document.getElementById('app-status').textContent=message;document.getElementById('rules-help').hidden=!rules;syncWriteButtons();}});}catch(error){writeStatus(liveError(error));}
+ try{const module=await import('./live-store.js?v=native-1');liveError=module.errorMessage;liveStore=await module.connectStore({onState:state=>{if(state.revision<liveRevision)return;if(writeBusy)pendingState=state;else{liveReady=true;liveLoaded=true;applyState(state);if(state.revision>0)window.DriveBackup.changed();}},onSignedOut:()=>{liveReady=false;liveLoaded=false;liveRevision=0;pendingState=null;operations.splice(0);categories.splice(0,categories.length,...emptyLedger().categories);if(dialog.open)dialog.close();render();},onStatus:(message,ready,rules)=>{liveReady=ready&&navigator.onLine;document.getElementById('app-status').textContent=message;document.getElementById('rules-help').hidden=!rules;syncWriteButtons();}});}catch(error){writeStatus(liveError(error));}
  document.getElementById('copy-rules').addEventListener('click',async()=>{try{const text=await(await fetch('firestore.rules',{cache:'no-store'})).text();await navigator.clipboard.writeText(text);toast('Reglas copiadas. Pegalas completas en Firestore → Reglas y publicá.');}catch{toast('No se pudo copiar. Abrí el enlace de las reglas para copiarlas.');}});
 }
 

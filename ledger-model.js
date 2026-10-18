@@ -1,4 +1,4 @@
-import {validPendingExpenses} from './pending-expenses.js?v=1';
+import {validPendingExpenses} from './pending-expenses.js?v=native-1';
 import AgendaModel from './agenda-model.js?v=field-kinds-1';
 // Money is stored as integer centavos. This module contains no personal data.
 export const DEFAULT_CATEGORIES = [{id:'food',name:'Comida'},{id:'outings',name:'Salidas'},{id:'fuel',name:'Combustible'},{id:'transport',name:'Transporte'},{id:'card',name:'Tarjeta'},{id:'uncategorized',name:'Sin categoría'}];

@@ -1,5 +1,6 @@
+import {showNativeReturn} from './native-note-bridge.js?v=1';
 import {parseVoiceExpense} from './voice-expense-parser.js?v=1';
-import {createPendingExpenseStore,SHARED_PENDING_KEY} from './pending-expenses.js?v=shared-3';
+import {createPendingExpenseStore,SHARED_PENDING_KEY} from './pending-expenses.js?v=native-1';
 const escape=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function initVoiceExpense({getCategories=()=>[],getToday=()=>new Date(Date.now()-3*3600000).toISOString().slice(0,10),onReview,currentApp='gastos'}){
  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -74,5 +75,5 @@ export function initVoiceExpense({getCategories=()=>[],getToday=()=>new Date(Dat
  window.addEventListener('storage',event=>{if(event.key===key){refresh();if(inbox.open)showInbox();}});
  refresh();
  const action=new URLSearchParams(location.search).get('accion');if(action==='audio'||action==='nota'||action==='pendientes'){if(action==='pendientes')showInbox();else open(false);const url=new URL(location.href);url.searchParams.delete('accion');history.replaceState(null,'',url);}
- return {count,refresh,review:reviewNote,complete(id){store.remove(id);changed();},exportData:()=>store.read(),restoreData(book){store.restore(book);changed();if(inbox.open)showInbox();}};
+ return {count,refresh,review:reviewNote,complete(id){const note=store.read().notes.find(n=>n.id===id);store.remove(id);changed();if(currentApp==='gastos')showNativeReturn(note,'gastos');},exportData:()=>store.read(),restoreData(book){store.restore(book);changed();if(inbox.open)showInbox();}};
 }

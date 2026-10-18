@@ -1,4 +1,4 @@
-import {initVoiceExpense} from '../voice-expense.js?v=shared-3';
+import {initVoiceExpense} from '../voice-expense.js?v=native-1';
 initVoiceExpense({currentApp:'hub'});
 let installPrompt=null;
 window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;document.getElementById('install-notes').hidden=false;});

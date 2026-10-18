@@ -1,0 +1,1 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.controlfinanzas.anotargasto.tests"><uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36"/><application android:label="Anotar gasto tests"/><instrumentation android:name=".NativeTests" android:targetPackage="com.controlfinanzas.anotargasto"/></manifest>
