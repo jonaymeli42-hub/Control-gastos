@@ -21,3 +21,5 @@ Ejecutar `bash build.sh`. El APK firmado y su SHA256 quedan en downloads/.
 Las pruebas web de intercambio están en ../tests/native-note-bridge.test.js. `bash test-android.sh` instala el APK y pruebas instrumentadas en un emulador o dispositivo de prueba conectado por adb. **Las pruebas borran las notas del dispositivo de prueba. No ejecutarlas en un teléfono con notas reales.** Comprueban persistencia, intercambio y confirmación autenticada. El dictado debe comprobarse también en un teléfono con un servicio de voz instalado.
 
 La versión 1.2 busca el manejador WebAPK instalado que corresponda al enlace de cada aplicación. Si no está disponible, usa el manejador HTTPS elegido en Android, sin forzar Chrome. Un acceso directo sin instalación WebAPK puede seguir abriéndose en el navegador.
+
+La versión 1.3 avisa con vibración cuando el servicio está listo para escuchar, aporta vocabulario de gastos en Android 13+ y solicita más tolerancia a pausas. El servicio de voz puede ignorar estas sugerencias; la precisión debe verificarse con audio real, nunca se garantiza ni se corrigen importes mediante suposiciones.
