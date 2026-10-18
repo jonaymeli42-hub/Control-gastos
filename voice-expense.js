@@ -1,14 +1,14 @@
 import {parseVoiceExpense} from './voice-expense-parser.js?v=1';
-import {createPendingExpenseStore} from './pending-expenses.js?v=1';
+import {createPendingExpenseStore,SHARED_PENDING_KEY} from './pending-expenses.js?v=shared-3';
 const escape=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export function initVoiceExpense({getCategories,getToday,onReview}){
+export function initVoiceExpense({getCategories=()=>[],getToday=()=>new Date(Date.now()-3*3600000).toISOString().slice(0,10),onReview,currentApp='gastos'}){
  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
- const key=document.body.dataset.appMode==='live'?'control-gastos-pending-expenses-v1':'control-gastos-demo-pending-expenses-v1';
+ const key=document.body.dataset.appMode==='live'?SHARED_PENDING_KEY:'control-gastos-demo-pending-expenses-v1';
  const store=createPendingExpenseStore(localStorage,key);
  const dialog=document.createElement('dialog');dialog.id='voice-expense';dialog.setAttribute('aria-labelledby','voice-title');
  dialog.innerHTML=`<div class="dialog-title"><h2 id="voice-title">Anotar para después</h2><button type="button" id="voice-close" aria-label="Cerrar">×</button></div><p class="muted">Decí algo corto: «6.700 en el kiosco».</p><button type="button" id="voice-record" class="primary">🎙 Dictar nota</button><p id="voice-status" role="status" aria-live="polite"></p><label for="voice-text">Tu nota</label><textarea id="voice-text" rows="3" maxlength="1000" placeholder="6.700 en el kiosco"></textarea><button type="button" id="voice-save" class="primary">Listo</button><button type="button" id="voice-inbox" class="action">Ver pendientes</button><p class="muted">Se guarda sola al dictar. No cambia tus saldos. Después completás el gasto desde Pendientes.</p>`;
  const inbox=document.createElement('dialog');inbox.id='pending-expenses';inbox.setAttribute('aria-labelledby','pending-title');
- inbox.innerHTML=`<div class="dialog-title"><h2 id="pending-title">Gastos pendientes</h2><button type="button" id="pending-close" aria-label="Cerrar">×</button></div><p class="muted">Tus notas guardadas en este teléfono. Todavía no son gastos. Se incluyen en los nuevos respaldos completos.</p><p id="pending-status" role="status"></p><div id="pending-list"></div><button type="button" id="pending-add" class="primary">🎙 Anotar otro</button>`;
+ inbox.innerHTML=`<div class="dialog-title"><h2 id="pending-title">Gastos pendientes</h2><button type="button" id="pending-close" aria-label="Cerrar">×</button></div><p class="muted">La misma lista para Control Gastos y Control Tarjetas, en este teléfono. Elegí dónde registrar cada nota cuando tengas tiempo.</p><p id="pending-status" role="status"></p><div id="pending-list"></div><button type="button" id="pending-add" class="primary">🎙 Anotar otro</button>`;
  document.body.append(dialog,inbox);
  const find=id=>dialog.querySelector('#'+id),record=find('voice-record'),status=find('voice-status'),text=find('voice-text');
  let recognition=null,timer=null,typingTimer=null,listening=false,generation=0,note=null,heard=false,savedText='',closeRequested=false,afterClose=null;
@@ -47,16 +47,26 @@ export function initVoiceExpense({getCategories,getToday,onReview}){
  function open(listen){if(dialog.open)return;note=newNote();text.value='';savedText='';heard=false;closeRequested=false;afterClose=null;status.textContent=Recognition?'Tocá Dictar nota. No hace falta elegir categoría ni Efectivo o Virtual.':'Escribí tu nota o usá el micrófono del teclado.';record.textContent='🎙 Dictar nota';dialog.showModal();if(listen)record.click();}
  function showInbox(){
   inbox.querySelector('#pending-status').textContent='';
-  try{const notes=store.read().notes.slice().reverse();inbox.querySelector('#pending-list').innerHTML=notes.length?notes.map(n=>`<article class="pending-note"><p>${escape(n.text)}</p><small>${escape(new Date(n.createdAt).toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}))}</small><div class="pending-note-actions"><button type="button" class="primary" data-review-note="${escape(n.id)}">Revisar y registrar</button><button type="button" class="action" data-discard-note="${escape(n.id)}">Descartar</button></div></article>`).join(''):'<p class="empty">No tenés gastos pendientes.</p>';}catch{inbox.querySelector('#pending-status').textContent='No pude leer las notas pendientes. No se modificó ningún dato.';}
+  try{const notes=store.read().notes.slice().reverse();inbox.querySelector('#pending-list').innerHTML=notes.length?notes.map(n=>`<article class="pending-note"><p>${escape(n.text)}</p><small>${escape(new Date(n.createdAt).toLocaleString('es-AR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}))}</small><div class="pending-note-actions"><button type="button" class="primary" data-review-note="${escape(n.id)}">Revisar y registrar</button><button type="button" class="action" data-discard-note="${escape(n.id)}">Descartar</button></div><div class="pending-targets" hidden><p>¿Dónde querés registrar esta nota?</p><button type="button" class="action" data-target-note="${escape(n.id)}" data-target="gastos">Control Gastos · gasto diario</button><button type="button" class="action" data-target-note="${escape(n.id)}" data-target="card-one">Control Tarjetas · un pago</button><button type="button" class="action" data-target-note="${escape(n.id)}" data-target="card-quota">Control Tarjetas · cuotas</button></div></article>`).join(''):'<p class="empty">No tenés gastos pendientes.</p>';}catch{inbox.querySelector('#pending-status').textContent='No pude leer las notas pendientes. No se modificó ningún dato.';}
   if(!inbox.open)inbox.showModal();
  }
  find('voice-inbox').onclick=()=>closeSafely(showInbox);inbox.querySelector('#pending-close').onclick=()=>inbox.close();inbox.querySelector('#pending-add').onclick=()=>{inbox.close();open(true);};
+ function reviewNote(id){
+  const n=store.read().notes.find(n=>n.id===id);if(!n)return false;
+  const draft=parseVoiceExpense(n.text,getCategories(),n.date);inbox.close();
+  if(!onReview?.(draft,n.id)){showInbox();inbox.querySelector('#pending-status').textContent='Conectá tu cuenta y esperá a que se confirme el acceso para registrar el gasto. La nota sigue guardada.';return false;}return true;
+ }
  inbox.addEventListener('click',event=>{
-  const review=event.target.closest('[data-review-note]'),discard=event.target.closest('[data-discard-note]');if(!review&&!discard)return;
+  const review=event.target.closest('[data-review-note]'),discard=event.target.closest('[data-discard-note]'),target=event.target.closest('[data-target-note]');if(!review&&!discard&&!target)return;
   try{
-   const id=review?.dataset.reviewNote||discard.dataset.discardNote,n=store.read().notes.find(n=>n.id===id);if(!n)return showInbox();
+   const id=review?.dataset.reviewNote||discard?.dataset.discardNote||target.dataset.targetNote,n=store.read().notes.find(n=>n.id===id);if(!n)return showInbox();
    if(discard){if(!confirm('¿Descartar esta nota pendiente? No modifica ningún gasto registrado.'))return;store.remove(id);changed();showInbox();return;}
-   const draft=parseVoiceExpense(n.text,getCategories(),n.date);inbox.close();if(!onReview(draft,n.id)){showInbox();inbox.querySelector('#pending-status').textContent='Conectá tu cuenta y esperá a que se confirme el acceso para registrar el gasto. La nota sigue guardada.';}
+   if(review){const choices=review.closest('article').querySelector('.pending-targets');choices.hidden=false;choices.scrollIntoView({block:'nearest',behavior:'smooth'});return;}
+   if(target.dataset.target==='gastos'&&currentApp==='gastos'){reviewNote(n.id);return;}
+   const route=target.dataset.target==='gastos'?'/Control-gastos/instalar.html':'/Control-tarjetas/index.html';
+   const url=new URL(route,location.origin);url.searchParams.set('nota',n.id);
+   if(target.dataset.target!=='gastos')url.searchParams.set('screen',target.dataset.target==='card-one'?'oneAddScreen':'addScreen');
+   location.href=url.href;
   }catch{inbox.querySelector('#pending-status').textContent='No pude abrir esta nota. Sigue guardada para revisar después.';}
  });
  document.addEventListener('click',event=>{if(event.target.closest('[data-voice-expense]'))open(true);else if(event.target.closest('[data-pending-expenses]'))showInbox();});
@@ -64,5 +74,5 @@ export function initVoiceExpense({getCategories,getToday,onReview}){
  window.addEventListener('storage',event=>{if(event.key===key){refresh();if(inbox.open)showInbox();}});
  refresh();
  const action=new URLSearchParams(location.search).get('accion');if(action==='audio'||action==='nota'||action==='pendientes'){if(action==='pendientes')showInbox();else open(false);const url=new URL(location.href);url.searchParams.delete('accion');history.replaceState(null,'',url);}
- return {count,refresh,complete(id){store.remove(id);changed();},exportData:()=>store.read(),restoreData(book){store.restore(book);changed();if(inbox.open)showInbox();}};
+ return {count,refresh,review:reviewNote,complete(id){store.remove(id);changed();},exportData:()=>store.read(),restoreData(book){store.restore(book);changed();if(inbox.open)showInbox();}};
 }

@@ -1,0 +1,14 @@
+{
+  "id":"./anotar-gasto",
+  "name":"Anotar gasto",
+  "short_name":"Anotar gasto",
+  "description":"Una nota rápida para revisar en Control Gastos o Control Tarjetas",
+  "lang":"es-AR",
+  "start_url":"./?accion=nota",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#111a22",
+  "theme_color":"#111a22",
+  "icons":[{"src":"../icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"../icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}],
+  "shortcuts":[{"name":"Notas pendientes","url":"./?accion=pendientes"}]
+}

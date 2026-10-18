@@ -1,3 +1,4 @@
+export const SHARED_PENDING_KEY='control-gastos-pending-expenses-v1';
 export const pendingOperationId=id=>'audio_'+id;
 const plain=value=>value&&typeof value==='object'&&!Array.isArray(value);
 export function validPendingExpenses(book){
