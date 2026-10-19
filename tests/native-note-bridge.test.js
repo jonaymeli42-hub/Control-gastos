@@ -18,3 +18,20 @@ test('malformed imports and untrusted return identifiers are rejected without er
  assert.equal(nativeReturnUrl({...note,nativeReceipt:'bad'},'gastos'),null);assert.equal(nativeReturnUrl(note,'other'),null);
  const url=nativeReturnUrl(note,'gastos');assert.match(url,/^intent:\/\/registrado\/android_/);assert.match(url,/package=com.controlfinanzas.anotargasto/);assert.match(url,/app=gastos/);
 });
+
+test('silent protocol is additive, upgrades the same pending note and uses a no-display receipt',async()=>{
+ const {createNativeCompletionQueue}=await import('../native-note-bridge.js');
+ const silent={...note,nativeCompletion:'silent-v1'};assert.deepEqual(parseNativeNote(fragment(silent)),silent);
+ const store=createPendingExpenseStore(memory(),'pending');store.upsert(note);store.upsert(silent);assert.equal(store.read().notes.length,1);assert.equal(store.read().notes[0].nativeCompletion,'silent-v1');
+ const url=nativeReturnUrl(silent,'tarjetas');assert.match(url,/^intent:\/\/registrado-silencioso\//);assert.match(url,/launchFlags=0x10010000/);assert.match(url,/browser_fallback_url=/);
+ assert.match(nativeReturnUrl(note,'gastos'),/^intent:\/\/registrado\//);
+ for(const bad of [{...silent,nativeCompletion:'other'},{...silent,nativeReceipt:undefined}])assert.throws(()=>parseNativeNote(fragment(bad)));
+ const storage=memory(),queue=createNativeCompletionQueue(storage);queue.enqueue(silent,'gastos');queue.enqueue(silent,'gastos');assert.equal(queue.read().length,1);
+ let navigated='';assert.equal(queue.flush({active:false,navigate:url=>{navigated=url;}}),false);assert.equal(navigated,'');assert.equal(queue.read().length,1);
+ const recreated=createNativeCompletionQueue(storage);assert.equal(recreated.flush({active:true,navigate:url=>{navigated=url;}}),true);assert.match(navigated,/registrado-silencioso/);assert.equal(recreated.read().length,0);
+});
+test('failed receipt dispatch keeps the queue and never stores the note text',async()=>{
+ const {createNativeCompletionQueue,NATIVE_COMPLETION_KEY}=await import('../native-note-bridge.js'),storage=memory(),queue=createNativeCompletionQueue(storage);queue.enqueue({...note,nativeCompletion:'silent-v1'},'tarjetas');
+ assert(!storage.getItem(NATIVE_COMPLETION_KEY).includes(note.text));assert.throws(()=>queue.flush({active:true,navigate(){throw Error('Browser unavailable');}}));assert.equal(queue.read().length,1);
+ storage.setItem(NATIVE_COMPLETION_KEY,'{"bad":true}');assert.throws(()=>queue.read());assert.equal(storage.getItem(NATIVE_COMPLETION_KEY),'{"bad":true}');
+});

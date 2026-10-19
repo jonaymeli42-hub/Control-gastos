@@ -1,6 +1,6 @@
 // This worker only controls the independent quick-note page, never the accounting apps.
-const CACHE='quick-notes-v3';
-const ASSETS=['./','./index.html','./app.js?v=pending-only-1','./manifest.webmanifest','../demo.css?v=native-1','../theme.js?v=system-bars-1','../voice-expense.js?v=pending-only-1','../voice-expense-parser.js?v=1','../pending-expenses.js?v=native-1','../native-note-bridge.js?v=1','../icons/icon-192.png','../icons/icon-512.png'];
+const CACHE='quick-notes-v4';
+const ASSETS=['./','./index.html','./app.js?v=silent-1','./manifest.webmanifest','../demo.css?v=native-1','../theme.js?v=system-bars-1','../voice-expense.js?v=silent-1','../voice-expense-parser.js?v=1','../pending-expenses.js?v=silent-1','../native-note-bridge.js?v=2','../icons/icon-192.png','../icons/icon-512.png'];
 const urls=new Set(ASSETS.map(path=>new URL(path,self.location.href).href));
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('quick-notes-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
