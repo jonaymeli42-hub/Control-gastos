@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.controlfinanzas.anotargasto" android:versionCode="5" android:versionName="1.4">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.controlfinanzas.anotargasto" android:versionCode="6" android:versionName="1.5">
   <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36"/>
   <uses-permission android:name="android.permission.RECORD_AUDIO"/>
   <uses-permission android:name="android.permission.INTERNET"/>
@@ -7,6 +7,9 @@
     <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize">
       <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
       <intent-filter><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.DEFAULT"/><category android:name="android.intent.category.BROWSABLE"/><data android:scheme="anotargasto" android:host="registrado"/></intent-filter>
+    </activity>
+    <activity android:name=".ReceiptActivity" android:exported="true" android:theme="@android:style/Theme.NoDisplay" android:taskAffinity="" android:excludeFromRecents="true" android:noHistory="true">
+      <intent-filter><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.DEFAULT"/><category android:name="android.intent.category.BROWSABLE"/><data android:scheme="anotargasto" android:host="registrado-silencioso"/></intent-filter>
     </activity>
   </application>
 </manifest>

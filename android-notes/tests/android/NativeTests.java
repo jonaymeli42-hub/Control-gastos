@@ -1,5 +1,8 @@
 package com.controlfinanzas.anotargasto.tests;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.view.accessibility.AccessibilityNodeInfo;
+import java.util.List;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
@@ -13,6 +16,7 @@ import com.controlfinanzas.anotargasto.MainActivity;
 import com.controlfinanzas.anotargasto.NoteStore;
 import org.json.JSONObject;
 public class NativeTests extends Instrumentation {
+ private String shell(String command)throws Exception{android.os.ParcelFileDescriptor fd=getUiAutomation().executeShellCommand(command);try(java.io.InputStream stream=new android.os.ParcelFileDescriptor.AutoCloseInputStream(fd);java.io.ByteArrayOutputStream buffer=new java.io.ByteArrayOutputStream()){byte[] bytes=new byte[4096];int count;while((count=stream.read(bytes))!=-1)buffer.write(bytes,0,count);return buffer.toString("UTF-8");}}
  private static void check(boolean yes,String message){if(!yes)throw new AssertionError(message);}
  private View findMic(View view){if("Mantené apretado para dictar; soltá para terminar".equals(view.getContentDescription()))return view;if(view instanceof ViewGroup){ViewGroup g=(ViewGroup)view;for(int i=0;i<g.getChildCount();i++){View found=findMic(g.getChildAt(i));if(found!=null)return found;}}return null;}
  private void setFlag(Activity activity,String name,boolean value){try{java.lang.reflect.Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);f.setBoolean(activity,value);}catch(Exception e){throw new AssertionError(e);}}
@@ -30,9 +34,14 @@ public class NativeTests extends Instrumentation {
   runOnMainSync(()->{Button end=findButton(activity.getWindow().getDecorView(),"Terminar");check(end!=null,"Finish missing");end.performClick();});waitForIdleSync();
   final Uri[] launched=new Uri[1];ActivityMonitor monitor=new ActivityMonitor(){@Override public ActivityResult onStartActivity(Intent intent){if(Intent.ACTION_VIEW.equals(intent.getAction())){check(!"com.android.chrome".equals(intent.getPackage()),"Must not force Chrome instead of installed app");launched[0]=intent.getData();return new ActivityResult(Activity.RESULT_OK,null);}return null;}};addMonitor(monitor);
   runOnMainSync(()->{Button send=findButton(activity.getWindow().getDecorView(),"Control Gastos");check(send!=null,"Destination button missing");send.performClick();});waitForIdleSync();removeMonitor(monitor);
-  check(launched[0]!=null,"Browser handoff missing");check("jonaymeli42-hub.github.io".equals(launched[0].getHost()),"Untrusted destination");check(id.equals(launched[0].getQueryParameter("nota")),"Wrong note ID");String fragment=launched[0].getEncodedFragment();check(fragment.startsWith("anotar="),"Wrong bridge fragment");JSONObject sent=new JSONObject(Uri.decode(fragment.substring(7)));check("6700 en el kiosco".equals(sent.getString("text")),"Note content changed");check(token.equals(sent.getString("nativeReceipt")),"Return token changed");check(store.count(false)==1,"Sending must not mark note registered");
+  check(launched[0]!=null,"Browser handoff missing");check("jonaymeli42-hub.github.io".equals(launched[0].getHost()),"Untrusted destination");check(id.equals(launched[0].getQueryParameter("nota")),"Wrong note ID");String fragment=launched[0].getEncodedFragment();check(fragment.startsWith("anotar="),"Wrong bridge fragment");JSONObject sent=new JSONObject(Uri.decode(fragment.substring(7)));check("6700 en el kiosco".equals(sent.getString("text")),"Note content changed");check(token.equals(sent.getString("nativeReceipt")),"Return token changed");check("silent-v1".equals(sent.getString("nativeCompletion")),"Silent completion capability missing");check(store.count(false)==1,"Sending must not mark note registered");
   check(!store.acknowledge(id,"forged-token-1234567890","gastos"),"Wrong return token accepted");check(store.count(false)==1,"Bad receipt changed state");
   Intent receipt=new Intent(Intent.ACTION_VIEW,Uri.parse("anotargasto://registrado/"+id+"?token="+token+"&app=gastos"));runOnMainSync(()->callActivityOnNewIntent(activity,receipt));waitForIdleSync();check(store.count(false)==0&&store.count(true)==1,"Verified receipt must move note out of pending");
-  runOnMainSync(()->activity.finish());result.putString("stream","PASS: finishing and tabs wait for final transcription, no automatic recording, microphone press/release, native typing, persisted note, timestamp, Android browser handoff encoding, no completion on send, forged receipt rejection, verified receipt completion.\n");finish(Activity.RESULT_OK,result);
+  String silentId="android_silent_fixture",silentToken="silent-token-1234567890";store.save(silentId,"Nota de prueba de confirmación","2026-10-19T12:00:00.000Z","2026-10-19",silentToken);
+  Intent standIn=new Intent();standIn.setComponent(new ComponentName("com.controlfinanzas.anotargasto.tests","com.controlfinanzas.anotargasto.tests.FinanceStandInActivity"));standIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);standIn.putExtra("receipt","anotargasto://registrado-silencioso/"+silentId+"?token="+silentToken+"&app=tarjetas");runOnMainSync(()->activity.startActivity(standIn));
+  long deadline=android.os.SystemClock.uptimeMillis()+120000;while(android.os.SystemClock.uptimeMillis()<deadline&&store.count(false)!=0)Thread.sleep(200);check(store.count(false)==0,"Silent activity did not acknowledge note");
+  String activities=shell("dumpsys activity activities");String foreground=java.util.Arrays.stream(activities.split("\n")).filter(line->line.contains("topResumedActivity=")).findFirst().orElse("");check(foreground.contains("FinanceStandInActivity"),"Silent acknowledgement replaced the finance app: "+foreground);
+  check(store.count(true)==2,"Silent receipt lost registered history");
+  runOnMainSync(()->activity.finish());result.putString("stream","PASS: finishing and tabs wait for final transcription, no automatic recording, microphone press/release, native typing, persisted note, timestamp, Android browser handoff encoding, no completion on send, forged receipt rejection, verified receipt completion, silent receipt without leaving the finance app.\n");finish(Activity.RESULT_OK,result);
  }catch(Throwable error){result.putString("stream",android.util.Log.getStackTraceString(error));finish(Activity.RESULT_CANCELED,result);}}
 }

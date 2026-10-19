@@ -4,7 +4,7 @@ Abre sin grabar. Mantené apretado el micrófono para dictar y soltalo para term
 
 Anotador nativo para guardar rápidamente una nota dictada o escrita, con fecha y hora, y revisarla después en Control Gastos o Control Tarjetas. No registra movimientos automáticamente.
 
-Las notas quedan en el almacenamiento privado del teléfono. Al elegir una aplicación se envía la nota mediante el fragmento de su enlace HTTPS. Después de confirmar el gasto, el botón «Volver a Anotar gasto» confirma el registro y quita la nota de pendientes. Abrir o cancelar un formulario no la completa. El menú permite exportar las notas a un archivo JSON.
+Las notas quedan en el almacenamiento privado del teléfono. Al elegir una aplicación se envía la nota mediante el fragmento de su enlace HTTPS. Desde la versión 1.5, después de confirmar el gasto se envía un recibo a una actividad Android sin pantalla: valida la nota y termina, dejando la aplicación financiera en primer plano. Las versiones anteriores conservan el botón de regreso. Abrir o cancelar un formulario no la completa. El menú permite exportar las notas a un archivo JSON.
 
 Requiere Android 8 o posterior. El dictado usa el servicio de reconocimiento de voz del teléfono y puede necesitar Internet. Si no está disponible, se puede escribir. Solo solicita micrófono y acceso a Internet.
 
@@ -25,3 +25,5 @@ La versión 1.2 busca el manejador WebAPK instalado que corresponda al enlace de
 La versión 1.3 avisa con vibración cuando el servicio está listo para escuchar, aporta vocabulario de gastos en Android 13+ y solicita más tolerancia a pausas. El servicio de voz puede ignorar estas sugerencias; la precisión debe verificarse con audio real, nunca se garantiza ni se corrigen importes mediante suposiciones.
 
 La versión 1.4 conserva la captura de resultados después de soltar el micrófono y bloquea el cambio de pestaña durante el resultado final. Terminar queda pendiente de esa respuesta para evitar guardar una transcripción parcial. Esto no acelera el servicio de voz.
+
+La confirmación automática requiere la capacidad `nativeCompletion: silent-v1` emitida por el APK 1.5. Solo se envía después del guardado financiero confirmado; cancelar o fallar no la emite. Si el navegador ya perdió la activación del botón por una espera larga, conserva el recibo en una cola local y lo despacha con la próxima interacción normal. La cola no incluye texto ni importes. La actividad de recibos usa una tarea sin afinidad, sin pantalla ni entrada en Recientes; la lista nativa se actualiza al volver a abrirla.

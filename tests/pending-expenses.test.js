@@ -25,3 +25,8 @@ test('backup includes notes without turning them into expenses and validates old
  backup.data.pendingExpenses.notes[0].text='Edited';await assert.rejects(()=>validateBackup(backup),/integridad/);
  backup.data.pendingExpenses.notes[0].text='';backup.checksum=await checksum(backup.data);await assert.rejects(()=>validateBackup(backup),/pendientes/);
 });
+test('a backup preserves silent native completion capability without adding a financial operation',async()=>{
+ const ledger=emptyLedger(),native={...note,id:'android_backup_note',nativeReceipt:'backup-token-1234567890',nativeCompletion:'silent-v1'};
+ const pendingExpenses={version:1,notes:[native]},backup=await makeBackup({ledger,revision:1,pendingExpenses});
+ assert.deepEqual(await validateBackup(backup),ledger);const restored=createPendingExpenseStore(memory(),'restored-native');restored.restore(backup.data.pendingExpenses);assert.deepEqual(restored.read().notes,[native]);assert.equal(ledger.operations.length,0);
+});
