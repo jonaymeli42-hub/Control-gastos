@@ -48,3 +48,5 @@ siguen siendo compatibles. Restaurar una copia nueva restaura también la
 agenda local, después de la confirmación y de conservar una copia previa.
 
 Validación adicional: `node --test tests/agenda-backup.test.js`.
+
+En la agenda, cada importe de Debo y el campo Mío de cada tarjeta permite cargar su «Mes anterior» desde Editar planilla. El total al final compara los mismos conceptos propios, incluidos los ya pagados. Los valores anteriores vacíos se distinguen de cero y la diferencia queda pendiente hasta completar los datos. Se reutilizan los campos anteriores inequívocos (por ejemplo Hogar/Celular); los datos ambiguos de varias boletas se conservan y se avisa que deben asociarse manualmente. Al preparar el mes siguiente, cada importe actual pasa a su propio dato anterior, conservando los respaldos y sin generar movimientos financieros.

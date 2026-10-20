@@ -19,7 +19,7 @@
     const isPayment=f=>!/^(notas?|cuotas?|vence|vencimiento|fecha|cierra|cierre|mes anterior|ajeno)\b/.test(name(f.label));
     for(const item of month.debts){
       const loan=/prestamos?/.test(name(item.label));
-      const fields=item.fields.filter(f=>fieldType(f)==='money'&&(f.kind==='money'||isPayment(f)||(loan&&/^(cuotas?|ajeno)\b/.test(name(f.label))&&String(f.value).trim()!==''&&amountCents(f.value)!==null))&&(loan||amountOwner(item,f)==='Mío'));
+      const fields=item.fields.filter(f=>!previousField(f)&&fieldType(f)==='money'&&(f.kind==='money'||isPayment(f)||(loan&&/^(cuotas?|ajeno)\b/.test(name(f.label))&&String(f.value).trim()!==''&&amountCents(f.value)!==null))&&(loan||amountOwner(item,f)==='Mío'));
       if(!fields.length)continue;
       const split=/movistar/i.test(item.label)||['hogar','celular'].every(label=>item.fields.some(f=>name(f.label)===label));
       if(split){
@@ -75,6 +75,8 @@
         if ('paid' in item) item.paid=false;
         for(const property of ['dueDate','homeDueDate','cellDueDate'])if(property in item)item[property]='';
         item.fields.forEach(f => {
+          const original=old.fields.find(x=>x.id===f.id);
+          if(original&&expenseField(group,old,original))f.previousAmount=amountInLabel(original)?original.label:original.value;
           const label = name(f.label);
           if(['debts','receivables'].includes(group) && amountInLabel(f)){f.label='';f.amountSide='label';}
           f.value = '';
@@ -108,6 +110,7 @@
     const money=new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',minimumFractionDigits:2,maximumFractionDigits:2});
     const format=value=>{const cents=amountCents(value);return String(value??'').trim()!==''&&cents!==null?money.format(cents/100):value;};
     for(const group of ['receivables','debts','cards'])for(const item of month[group])for(const f of item.fields){
+      if(f.previousAmount!==undefined)f.previousAmount=format(f.previousAmount);
       if(fieldType(f)==='text'){if(f.kind===undefined&&/^cuota$/i.test(f.label.trim())&&/^\s*(?:\$|ARS)/i.test(f.value)){const cents=amountCents(f.value);if(cents!==null)f.value=String(cents/100);}continue;}
       const label=f.label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
       if(f.kind===undefined&&/^(notas?|fecha|vence|vencimiento|cierra|cierre|cantidad|numero|plazo|meses)\b/.test(label))continue;
@@ -117,6 +120,37 @@
     return month;
   }
   const amountOwner=(item,field)=>['Mío','Ajeno'].includes(field.owner)?field.owner:/pr[eé]stamos?\s+(?:ezequiel|exe|eze)\b/i.test(item.label)?'Ajeno':'Mío';
+  const normalizedName=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+  const previousField=f=>/^mes anterior\b/.test(normalizedName(f.label));
+  function expenseField(group,item,f){
+    if(!['debts','cards'].includes(group)||fieldType(f)!=='money'||previousField(f))return false;
+    if(group==='cards')return normalizedName(f.label)==='mio';
+    if(f.label==='Nuevo campo'&&!f.value.trim())return false;
+    return f.kind==='money'||! /^(?:notas?|cuotas?|vence|vencimiento|fecha|cierra|cierre|ajeno)\b/.test(normalizedName(f.label));
+  }
+  function legacyPrevious(group,item,f){
+    if(!expenseField(group,item,f))return null;
+    const fields=item.fields.filter(previousField),label=normalizedName(f.label);
+    const named=fields.find(x=>normalizedName(x.label)==='mes anterior '+label);
+    if(named)return named;
+    if(group==='cards'||item.fields.filter(x=>expenseField(group,item,x)).length===1)return fields.find(x=>normalizedName(x.label)==='mes anterior')||null;
+    return null;
+  }
+  function previousValue(group,item,f){return f.previousAmount!==undefined?f.previousAmount:legacyPrevious(group,item,f)?.value??'';}
+  function hiddenPrevious(group,item,f){return previousField(f)&&item.fields.some(x=>legacyPrevious(group,item,x)?.id===f.id);}
+  function comparison(month){
+    let cents=0,missing=0,unreadable=0,unassigned=0;
+    if(!month)return {amount:0,missing,unreadable,unassigned};
+    for(const group of ['debts','cards'])for(const item of month[group]){
+      for(const f of item.fields){
+        if(previousField(f)&&f.value.trim()&&!hiddenPrevious(group,item,f))unassigned++;
+        if(!expenseField(group,item,f)||(group==='debts'&&amountOwner(item,f)!=='Mío'))continue;
+        const value=previousValue(group,item,f);if(!String(value).trim()){missing++;continue;}
+        const amount=amountCents(value);if(amount===null)unreadable++;else cents+=amount;
+      }
+    }
+    return {amount:cents/100,missing,unreadable,unassigned};
+  }
   function ownTotal(month){
     if(!month)return {amount:0,unreadable:0};
     const name=x=>String(x).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
@@ -124,7 +158,7 @@
     const include=value=>{const parsed=amountCents(value);if(parsed===null)unreadable++;else cents+=parsed;};
     for(const item of month.debts){
       for(const f of item.fields){
-        if(fieldType(f)==='text')continue;
+        if(fieldType(f)==='text'||previousField(f))continue;
         if(f.label==='Nuevo campo'&&!f.value.trim())continue;
         if(f.kind!=='money'&&/^(?:notas?|cuotas?|vence|vencimiento|fecha|cierra|cierre|mes anterior|ajeno)\b/.test(name(f.label)))continue;
         if(amountOwner(item,f)==='Mío')include(amountInLabel(f)?f.label:f.value);
@@ -138,12 +172,12 @@
   function validMonth(m) {
     if (!m || !['order','receivables','debts','cards'].every(k=>Array.isArray(m[k]) && m[k].length<=200)) return false;
     const ids=new Set();const unique=id=>{if(typeof id!=='string'||!/^[A-Za-z0-9_-]{1,100}$/.test(id)||ids.has(id))return false;ids.add(id);return true;};
-    return m.order.every(x=>x&&unique(x.id)&&text(x.label)&&typeof x.paid==='boolean'&&(x.dueDate===undefined||validDate(x.dueDate))&&(x.sourceKey===undefined||text(x.sourceKey))&&(x.orderDate===undefined||text(x.orderDate))&&(x.orderAmountCents===undefined||x.orderAmountCents===null||Number.isSafeInteger(x.orderAmountCents))) && ['receivables','debts','cards'].every(k=>m[k].every(x=>x&&unique(x.id)&&text(x.label)&&['dueDate','homeDueDate','cellDueDate'].every(property=>x[property]===undefined||validDate(x[property]))&&(x.paid===undefined||typeof x.paid==='boolean')&&Array.isArray(x.fields)&&x.fields.length<=50&&x.fields.every(f=>f&&unique(f.id)&&text(f.label)&&text(f.value)&&(f.kind===undefined||['money','text'].includes(f.kind))&&(f.detail===undefined||text(f.detail))&&(f.owner===undefined||['Mío','Ajeno'].includes(f.owner))&&(f.dueDate===undefined||validDate(f.dueDate))&&(f.paid===undefined||typeof f.paid==='boolean')&&(f.amountSide===undefined||f.amountSide==='label'))));
+    return m.order.every(x=>x&&unique(x.id)&&text(x.label)&&typeof x.paid==='boolean'&&(x.dueDate===undefined||validDate(x.dueDate))&&(x.sourceKey===undefined||text(x.sourceKey))&&(x.orderDate===undefined||text(x.orderDate))&&(x.orderAmountCents===undefined||x.orderAmountCents===null||Number.isSafeInteger(x.orderAmountCents))) && ['receivables','debts','cards'].every(k=>m[k].every(x=>x&&unique(x.id)&&text(x.label)&&['dueDate','homeDueDate','cellDueDate'].every(property=>x[property]===undefined||validDate(x[property]))&&(x.paid===undefined||typeof x.paid==='boolean')&&Array.isArray(x.fields)&&x.fields.length<=50&&x.fields.every(f=>f&&unique(f.id)&&text(f.label)&&text(f.value)&&(f.kind===undefined||['money','text'].includes(f.kind))&&(f.previousAmount===undefined||text(f.previousAmount))&&(f.detail===undefined||text(f.detail))&&(f.owner===undefined||['Mío','Ajeno'].includes(f.owner))&&(f.dueDate===undefined||validDate(f.dueDate))&&(f.paid===undefined||typeof f.paid==='boolean')&&(f.amountSide===undefined||f.amountSide==='label'))));
   }
   function validBook(b) {
     return b && (b.notepad===undefined||(typeof b.notepad==='string'&&b.notepad.length<=20000)) && b.version===1 && b.months && typeof b.months==='object' && !Array.isArray(b.months) && Object.keys(b.months).length<=500 && Object.entries(b.months).every(([key,m])=>/^\d{4}-(0[1-9]|1[0-2])$/.test(key)&&validMonth(m));
   }
-  globalThis.PaymentAgendaModel = {selectionAmount,fieldType,normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
+  globalThis.PaymentAgendaModel = {expenseField,legacyPrevious,previousValue,hiddenPrevious,comparison,selectionAmount,fieldType,normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
 })();
 
 export default globalThis.PaymentAgendaModel;
