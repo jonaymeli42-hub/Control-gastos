@@ -46,6 +46,12 @@
     month.order=order;
     return month;
   }
+  function selectionAmount(month,item,mode='total'){
+    if(mode!=='own'||!String(item.sourceKey||'').startsWith('cards:'))return item.orderAmountCents??null;
+    const card=month.cards.find(c=>'cards:'+c.id===item.sourceKey);
+    const own=card?.fields.find(f=>String(f.label).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase()==='mio');
+    return own&&fieldType(own)==='money'?amountCents(own.value):null;
+  }
   function sortOrder(month,monthKey){
     const year=Number(monthKey.slice(0,4)),monthNumber=Number(monthKey.slice(5,7));
     const rank=value=>{
@@ -137,7 +143,7 @@
   function validBook(b) {
     return b && (b.notepad===undefined||(typeof b.notepad==='string'&&b.notepad.length<=20000)) && b.version===1 && b.months && typeof b.months==='object' && !Array.isArray(b.months) && Object.keys(b.months).length<=500 && Object.entries(b.months).every(([key,m])=>/^\d{4}-(0[1-9]|1[0-2])$/.test(key)&&validMonth(m));
   }
-  globalThis.PaymentAgendaModel = {fieldType,normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
+  globalThis.PaymentAgendaModel = {selectionAmount,fieldType,normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
 })();
 
 export default globalThis.PaymentAgendaModel;
