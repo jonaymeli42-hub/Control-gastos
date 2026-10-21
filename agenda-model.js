@@ -10,11 +10,12 @@
       debts: [block('Luz',['Importe','Notas']),block('Gas',['Importe','Notas']),block('Agua',['Importe','Notas']),block('Movistar',['Hogar','Celular','Mes anterior hogar','Mes anterior celular']),block('Gimnasio',['Importe']),block('Auto',['Importe','Notas']),block('Préstamos',['Importe','Notas'])],
       cards: [block('Tarjeta / crédito',['Vence','Cierra','Total','Mío','Ajeno','Mes anterior'])]};
   }
-  function syncOrder(month) {
+  const isPaid=f=>f.paid??(amountInLabel(f)&&/^(pagado|cobrado|recibido)$/i.test(f.value?.trim()||''));
+  function paymentEntries(month) {
     const entries=[];
     const fieldAmount=f=>amountCents(amountInLabel(f)?f.label:f.value);
     const sumAmounts=fields=>{const values=fields.map(fieldAmount);return values.some(value=>value===null)?null:values.reduce((sum,value)=>sum+value,0);};
-    const add=(sourceKey,label,dueDate='',paid=false,amount=0)=>entries.push({sourceKey,label,dueDate,paid:!!paid,amount});
+    const add=(sourceKey,label,dueDate='',targets=[],amount=0)=>entries.push({sourceKey,label,dueDate,targets,paid:targets.length>0&&targets.every(isPaid),amount});
     const name=value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
     const isPayment=f=>!/^(notas?|cuotas?|vence|vencimiento|fecha|cierra|cierre|mes anterior|ajeno)\b/.test(name(f.label));
     for(const item of month.debts){
@@ -25,26 +26,48 @@
       if(split){
         for(const f of fields.filter(f=>['hogar','celular'].includes(name(f.label)))){
           const property=name(f.label)==='hogar'?'homeDueDate':'cellDueDate';
-          add('debts:'+item.id+':'+f.id,item.label+' · '+f.label,item[property]??(property==='homeDueDate'?item.dueDate||'':''),f.paid,fieldAmount(f));
+          add('debts:'+item.id+':'+f.id,item.label+' · '+f.label,item[property]??(property==='homeDueDate'?item.dueDate||'':''),[f],fieldAmount(f));
         }
       }else if(loan){
-        fields.forEach((f,index)=>add('debts:'+item.id+':'+f.id,item.label+(!amountInLabel(f)&&!/^(importe|total|monto)$/i.test(f.label.trim())?' · '+f.label:''),f.dueDate??(index===0?item.dueDate||'':''),f.paid,fieldAmount(f)));
-      }else add('debts:'+item.id,item.label,item.dueDate||'',fields.every(f=>f.paid===true),sumAmounts(fields));
+        fields.forEach((f,index)=>add('debts:'+item.id+':'+f.id,item.label+(!amountInLabel(f)&&!/^(importe|total|monto)$/i.test(f.label.trim())?' · '+f.label:''),f.dueDate??(index===0?item.dueDate||'':''),[f],fieldAmount(f)));
+      }else add('debts:'+item.id,item.label,item.dueDate||'',fields,sumAmounts(fields));
     }
     for(const item of month.cards){
       const due=item.fields.find(f=>/^(vence|vencimiento|fecha de vencimiento)$/.test(name(f.label)))?.value.trim()||'';
       const total=item.fields.find(f=>fieldType(f)==='money'&&name(f.label)==='total')||item.fields.find(f=>fieldType(f)==='money'&&name(f.label)==='mio');
-      add('cards:'+item.id,item.label,item.dueDate||due,item.paid,total?amountCents(total.value):0);
+      add('cards:'+item.id,item.label,item.dueDate||due,[item],total?amountCents(total.value):0);
     }
+    return entries;
+  }
+  function syncOrder(month) {
+    const entries=paymentEntries(month);
     const byKey=new Map(entries.map(item=>[item.sourceKey,item]));
     const order=[];
     for(const old of month.order){
       const entry=byKey.get(old.sourceKey);
-      if(entry){order.push({...old,label:entry.label,orderDate:entry.dueDate,orderAmountCents:entry.amount});byKey.delete(old.sourceKey);}
+      if(entry){order.push({...old,label:entry.label,paid:entry.paid,orderDate:entry.dueDate,orderAmountCents:entry.amount});byKey.delete(old.sourceKey);}
     }
     for(const entry of byKey.values())order.push({id:uid(),label:entry.label,paid:entry.paid,sourceKey:entry.sourceKey,orderDate:entry.dueDate,orderAmountCents:entry.amount});
     month.order=order;
     return month;
+  }
+  // The planilla stores payment state; order rows resolve their existing sourceKey.
+  // Targets are references only while updating, never additional saved records.
+  function setPaid(month,group,id,fieldId,paid) {
+    if(typeof paid!=='boolean'||!['order','debts','cards','receivables'].includes(group))return false;
+    if(group==='order'){
+      const order=month.order.find(item=>item.id===id);
+      const entry=order&&paymentEntries(month).find(item=>item.sourceKey===order.sourceKey);
+      if(!entry)return false;
+      entry.targets.forEach(target=>{target.paid=paid;});
+    }else{
+      const item=month[group].find(item=>item.id===id);
+      const target=fieldId?item?.fields.find(field=>field.id===fieldId):item;
+      if(!target)return false;
+      target.paid=paid;
+    }
+    syncOrder(month);
+    return true;
   }
   function selectionAmount(month,item,mode='total'){
     if(mode!=='own'||!String(item.sourceKey||'').startsWith('cards:'))return item.orderAmountCents??null;
@@ -177,7 +200,8 @@
   function validBook(b) {
     return b && (b.notepad===undefined||(typeof b.notepad==='string'&&b.notepad.length<=20000)) && b.version===1 && b.months && typeof b.months==='object' && !Array.isArray(b.months) && Object.keys(b.months).length<=500 && Object.entries(b.months).every(([key,m])=>/^\d{4}-(0[1-9]|1[0-2])$/.test(key)&&validMonth(m));
   }
-  globalThis.PaymentAgendaModel = {expenseField,legacyPrevious,previousValue,hiddenPrevious,comparison,selectionAmount,fieldType,normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
+  globalThis.PaymentAgendaModel = {isPaid,setPaid,expenseField,legacyPrevious,previousValue,hiddenPrevious,comparison,selectionAmount,fieldType,normalizeAmounts,sortOrder,syncOrder,uid,field,block,receivable,emptyMonth,nextMonth,validMonth,validBook,amountInLabel,amountCents,amountOwner,ownTotal};
 })();
 
 export default globalThis.PaymentAgendaModel;
+

@@ -1,4 +1,4 @@
-import M from './agenda-model.js?v=previous-amount-1';
+import M from './agenda-model.js?v=paid-sync-1';
 (() => {
   'use strict';
   const KEY='control-tarjetas-agenda-v1';
@@ -35,7 +35,7 @@ import M from './agenda-model.js?v=previous-amount-1';
   function leaveEdit(){if(noteChanged()){if(!confirm('El anotador tiene cambios sin guardar. ¿Descartarlos?'))return false;noteDraft=null;}if(draft && dirty && !confirm('Hay cambios sin guardar. ¿Descartarlos?'))return false;draft=null;dirty=false;return true;}
   function tools(group,id,index,total){return `<div class="agenda-tools"><button type="button" data-agenda-action="up" data-group="${group}" data-id="${id}" ${index===0?'disabled':''} aria-label="Mover hacia arriba">↑</button><button type="button" data-agenda-action="down" data-group="${group}" data-id="${id}" ${index===total-1?'disabled':''} aria-label="Mover hacia abajo">↓</button>${draft?`<button type="button" data-agenda-action="remove" data-group="${group}" data-id="${id}" aria-label="Eliminar concepto">Eliminar</button>`:''}</div>`;}
   const serviceAmount=(group,item,f)=>M.fieldType(f)==='money'&&(group==='receivables'||group==='debts' && /luz|gas|agua|movistar|servicio/i.test(item.label)) && (f.kind==='money'||M.amountInLabel(f)||/^(importe|total|hogar|celular|monto)$/i.test(f.label.trim()));
-  const isPaid=f=>f.paid??(M.amountInLabel(f)&&/^(pagado|cobrado|recibido)$/i.test(f.value?.trim()||''));
+  const isPaid=M.isPaid;
   function paidButton(group,item,field){const value=field||item,paid=field?isPaid(field):!!item.paid,word=group==='receivables'?'Cobrado':'Pagado';return `<button type="button" class="agenda-paid ${paid?'is-paid':''}" data-agenda-action="toggle-paid" data-group="${group}" data-id="${item.id}" ${field?`data-field="${field.id}"`:''} aria-pressed="${!!paid}" aria-label="${escape(item.label)}${field?' · '+escape(field.label):''}: ${paid?word+', volver a pendiente':'marcar como '+word.toLowerCase()}">${paid?'✓':''}</button>`;}
   function ownerRow(group,item,f){
     if(group!=='debts'||(!serviceAmount(group,item,f)&&!remainingField(group,item,f)))return '';
@@ -133,6 +133,15 @@ import M from './agenda-model.js?v=previous-amount-1';
     const input=event.target;
     if(input.id==='agenda-notepad-text'){noteDraft=input.value;dialog.querySelector('[data-note-status]').textContent=noteChanged()?'Cambios sin guardar. Tocá Guardar anotación.':'Sin cambios pendientes.';return;}
     if(input.dataset.orderSelect){const chosen=selection();if(input.checked)chosen.add(input.dataset.orderSelect);else chosen.delete(input.dataset.orderSelect);input.closest('.agenda-order').classList.toggle('is-selected',input.checked);updateOrderSum();return;}if(!input.dataset.group)return;
+    if(input.dataset.group==='order'&&input.dataset.property==='paid'){
+      const item=(draft||book).months[selected]?.order.find(item=>item.id===input.dataset.id);
+      if(!item)return;
+      const paid=input.checked,position=capturePosition();
+      if(!confirm(`${paid?'Confirmar como pagado':'Volver a marcar como pendiente'}: ${item.label}. Se actualizará también en la planilla. ¿Continuar?`)){input.checked=item.paid;return;}
+      if(mutate(month=>M.setPaid(month,'order',item.id,null,paid)))renderKeepingPosition(position);
+      else input.checked=item.paid;
+      return;
+    }
     mutate(m=>{const item=m[input.dataset.group].find(x=>x.id===input.dataset.id);if(!item)return;const target=input.dataset.field?item.fields.find(f=>f.id===input.dataset.field):item;if(input.dataset.property==='kind'&&input.value==='text'){if(target.amountSide==='label'){target.value=target.label;target.label='Información';delete target.amountSide;}const cents=M.amountCents(target.value);if(/^\s*(?:\$|ARS)/i.test(target.value)&&cents!==null)target.value=String(cents/100);}target[input.dataset.property]=input.type==='checkbox'?input.checked:input.value;});
     if(input.dataset.property==='kind'){const position=capturePosition();renderKeepingPosition(position);}
     updateOwnTotal();
@@ -151,8 +160,8 @@ import M from './agenda-model.js?v=previous-amount-1';
       const target=b.dataset.field?item?.fields.find(f=>f.id===b.dataset.field):item;
       if(!target)return;
       if(!confirm(`${isPaid(target)?'Volver a marcar como pendiente':group==='receivables'?'Confirmar como cobrado':'Confirmar como pagado'}: ${item.label}${b.dataset.field?' · '+target.label:''}. ¿Continuar?`))return;
-      const position=dialog.scrollTop;
-      if(mutate(m=>{const next=m[group].find(x=>x.id===b.dataset.id);const value=b.dataset.field?next.fields.find(f=>f.id===b.dataset.field):next;value.paid=!isPaid(target);})){render();dialog.scrollTop=position;}return;
+      const position=capturePosition();
+      if(mutate(month=>M.setPaid(month,group,item.id,b.dataset.field||null,!isPaid(target))))renderKeepingPosition(position);return;
     }
     if(action==='close'){if(leaveEdit()){orderSelection.clear();dialog.close();}return;}
     if(action==='edit'){const position=capturePosition();draft=structuredClone(book);dirty=false;renderKeepingPosition(position);return;}
@@ -224,3 +233,4 @@ import M from './agenda-model.js?v=previous-amount-1';
   window.addEventListener('hashchange',loadPrivateTemplate);
   loadPrivateTemplate();
 })();
+

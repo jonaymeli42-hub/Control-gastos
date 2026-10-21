@@ -50,3 +50,17 @@ agenda local, después de la confirmación y de conservar una copia previa.
 Validación adicional: `node --test tests/agenda-backup.test.js`.
 
 En la agenda, cada importe de Debo y el campo Mío de cada tarjeta permite cargar su «Mes anterior» desde Editar planilla. El total al final compara los mismos conceptos propios, incluidos los ya pagados. Los valores anteriores vacíos se distinguen de cero y la diferencia queda pendiente hasta completar los datos. Se reutilizan los campos anteriores inequívocos (por ejemplo Hogar/Celular); los datos ambiguos de varias boletas se conservan y se avisa que deben asociarse manualmente. Al preparar el mes siguiente, cada importe actual pasa a su propio dato anterior, conservando los respaldos y sin generar movimientos financieros.
+
+
+## Marcas de pago vinculadas
+
+La planilla guarda el estado de pago y la orden lo muestra mediante el `sourceKey`
+existente. Marcar Pagado o Pendiente desde cualquiera de las dos vistas actualiza
+los mismos campos de origen, sin crear gastos ni modificar importes, fechas o
+movimientos financieros. Movistar y préstamos conservan sus vínculos por ítem;
+los servicios agrupados figuran pagados cuando todos sus importes incluidos lo
+están. La selección Sumar sigue siendo independiente de Pagado.
+
+Se conservan las confirmaciones, el guardado y la cancelación de borradores y los
+respaldos existentes. Al recalcular una orden existente prevalece la marca de la
+planilla vinculada. Pruebas: `node --test tests/agenda-paid-sync.test.js tests/agenda-backup.test.js`.
