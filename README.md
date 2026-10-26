@@ -64,3 +64,23 @@ están. La selección Sumar sigue siendo independiente de Pagado.
 Se conservan las confirmaciones, el guardado y la cancelación de borradores y los
 respaldos existentes. Al recalcular una orden existente prevalece la marca de la
 planilla vinculada. Pruebas: `node --test tests/agenda-paid-sync.test.js tests/agenda-backup.test.js`.
+
+
+## Total de ingresos y entradas del mes
+
+Inicio y Ver detalle muestran por separado el subtotal de ingresos propios,
+los pases recibidos de otros meses (indicando el mes de origen) y los préstamos
+personales temporales recibidos. El total visible suma estas tres entradas;
+Evolución usa el mismo total y conserva el desglose. Los aportes ajenos para pagos
+siguen en su apartado y no se vuelven a sumar en este total.
+
+`income-overview.js` calcula esta vista sin modificar operaciones, categorías ni
+copias de seguridad. Los pases de salida y las transferencias entre Efectivo y
+Virtual no se cuentan como entradas. No se inventa una clasificación de sueldo
+para un pase: se muestra como dinero de otro mes. La clasificación económica de
+ingreso propio en `ledger-model.js` permanece igual; un préstamo sigue separado
+del sueldo y sus devoluciones de capital siguen sin ser gastos.
+
+El total es de entradas brutas, no de saldo: no descuenta devoluciones de capital,
+pases de salida ni ahorro, que sí afectan el dinero disponible. Los gastos reales
+mantienen su cálculo anterior. Pruebas: `node --test tests/income-overview.test.js`.
