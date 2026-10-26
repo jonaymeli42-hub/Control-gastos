@@ -79,3 +79,6 @@ body.dark .movement-days .day,[data-theme="dark"] .movement-days .day{border-bot
 .pending-targets{display:grid;gap:8px;margin-top:12px}.pending-targets[hidden]{display:none}.pending-targets p{margin:2px 0 4px}.pending-targets .action{font-size:13px}.notes-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.notes-intro{line-height:1.6}.notes-install{margin:14px 0}.notes-app header{margin-bottom:24px}
 
 #native-note-return{position:fixed;left:12px;right:12px;bottom:max(100px,env(safe-area-inset-bottom));z-index:1000;max-width:520px;margin:auto;padding:16px;border:1px solid #8ed5b5;border-radius:16px;background:#183f36;color:#effff7;box-shadow:0 8px 30px #0007}#native-note-return p{margin:0 0 12px}#native-note-return a{display:block;border-radius:10px;padding:14px;text-align:center;background:#8ed5b5;color:#10291f;text-decoration:none;font-weight:700}#native-note-return button{display:block;margin:8px auto 0;padding:8px 16px;min-height:40px;border:0;background:transparent;color:#effff7;font:inherit}
+
+
+.summary-line b.personal-income-subtotal{color:var(--accent)}
